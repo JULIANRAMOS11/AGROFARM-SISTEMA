@@ -1,0 +1,20 @@
+{
+  "name": "api-agrofarm",
+  "version": "1.0.0",
+  "description": "API del proyecto AGROFARM - Evidencia GA7-220501096-AA5-EV03",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "Julian Ramos Guarin",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.0",
+    "pg": "^8.17.1"
+  }
+}
