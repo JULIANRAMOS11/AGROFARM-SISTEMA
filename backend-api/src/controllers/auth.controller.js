@@ -32,17 +32,17 @@ export async function register(req, res) {
 }
 
 export async function login(req, res) {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { username, password } = req.body;
+  if (!username || !password) {
     return res
       .status(400)
-      .json({ error: "email y password son obligatorios" });
+      .json({ error: "username y password son obligatorios" });
   }
 
   try {
     const { rows } = await query(
-      "SELECT id, username, email, role, password_hash FROM users WHERE email = $1",
-      [email]
+      "SELECT id, username, role, password_hash FROM users WHERE username = $1",
+      [username]
     );
     const user = rows[0];
     if (!user) return res.status(401).json({ error: "Credenciales inválidas" });
@@ -52,7 +52,7 @@ export async function login(req, res) {
 
     res.json({
       mensaje: "Login OK",
-      usuario: { id: user.id, username: user.username, email: user.email, role: user.role },
+      usuario: { id: user.id, username: user.username, role: user.role },
     });
   } catch (err) {
     res.status(500).json({ error: "Error en login", detail: err.message });

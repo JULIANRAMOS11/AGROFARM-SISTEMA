@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,8 +12,8 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    if (email.trim() === "" || password.trim() === "") {
-      setError("Debe ingresar email y contraseña.");
+    if (username.trim() === "" || password.trim() === "") {
+      setError("Debe ingresar usuario y contraseña.");
       return;
     }
 
@@ -25,7 +25,7 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          email: email.trim(),
+          username: username.trim(),
           password: password.trim(),
         }),
       });
@@ -48,7 +48,7 @@ export default function Login() {
     }
   };
 
-  const disabled = loading || email.trim() === "" || password.trim() === "";
+  const disabled = loading || username.trim() === "" || password.trim() === "";
 
   return (
     <div className="min-h-screen flex bg-white overflow-x-hidden">
@@ -100,14 +100,14 @@ export default function Login() {
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
               <input
-                type="email"
-                name="email"
-                placeholder="correo@ejemplo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition outline-none"
+                type="text"
+                name="username"
+                placeholder="Nombre de usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition outline-none"
               />
             </div>
 
