@@ -9,11 +9,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN?.split(",").map((o) =>
-  o.trim()
-);
 
-app.use(cors({ origin: FRONTEND_ORIGIN || "*", credentials: false }));
+// Configuración de CORS para producción y desarrollo
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://agrofarm-sistema.vercel.app"
+];
+
+app.use(cors({ 
+  origin: allowedOrigins,
+  credentials: true 
+}));
 app.use(express.json());
 
 app.get("/health", async (_req, res) => {
