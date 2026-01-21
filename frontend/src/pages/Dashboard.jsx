@@ -19,7 +19,7 @@ export default function Dashboard() {
       setError("");
 
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:4000/api/pigs", {
+      const res = await fetch("https://api-agrofarm.onrender.com/api/pigs", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const handleAddPig = async (nuevoCerdo) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:4000/api/pigs", {
+      const res = await fetch("https://api-agrofarm.onrender.com/api/pigs", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -81,7 +81,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const newStatus = currentStatus === "ACTIVO" ? "INACTIVO" : "ACTIVO";
       
-      const res = await fetch(`http://localhost:4000/api/pigs/${id}/status`, {
+      const res = await fetch(`https://api-agrofarm.onrender.com/api/pigs/${id}/status`, {
         method: "PATCH",
         headers: {
           "Authorization": `Bearer ${token}`,
