@@ -1,5 +1,5 @@
 // src/components/PigForm.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 
 /**
  * Formulario controlado para registrar cerdos.

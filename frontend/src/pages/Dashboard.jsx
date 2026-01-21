@@ -1,5 +1,5 @@
 // src/pages/Dashboard.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import Header from "../components/Header";
@@ -47,6 +47,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadPigs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Agrega un nuevo cerdo a la lista

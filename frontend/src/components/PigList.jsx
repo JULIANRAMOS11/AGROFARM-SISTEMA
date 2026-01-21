@@ -1,6 +1,4 @@
 // src/components/PigList.jsx
-import React from "react";
-
 /**
  * Tabla que muestra el listado de cerdos registrados.
  */
