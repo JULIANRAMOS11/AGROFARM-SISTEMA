@@ -25,6 +25,7 @@ export default function Dashboard() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -61,6 +62,7 @@ export default function Dashboard() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(nuevoCerdo),
       });
 
@@ -88,6 +90,7 @@ export default function Dashboard() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ estado: newStatus }),
       });
 

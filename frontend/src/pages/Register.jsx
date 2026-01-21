@@ -28,6 +28,7 @@ export default function Register() {
       const res = await fetch("https://api-agrofarm.onrender.com/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
