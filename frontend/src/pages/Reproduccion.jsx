@@ -7,7 +7,6 @@ export default function Reproduccion() {
   const [servicios, setServicios] = useState([]);
   const [partos, setPartos] = useState([]);
   const [pigs, setPigs] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showPartoForm, setShowPartoForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -38,14 +37,11 @@ export default function Reproduccion() {
 
   const fetchServicios = async () => {
     try {
-      setLoading(true);
       const res = await fetch(`${API_BASE_URL}/reproduccion`);
       const data = await res.json();
       setServicios(data);
     } catch (error) {
       console.error("Error al cargar servicios:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
