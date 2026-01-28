@@ -9,6 +9,8 @@ import produccionRoutes from "./routes/produccion.routes.js";
 import nutricionRoutes from "./routes/nutricion.routes.js";
 import perfilRoutes from "./routes/perfil.routes.js";
 import { pool } from "./config/db.js";
+import { requestLogger } from "./middlewares/auth.middleware.js";
+import { notFound, errorHandler } from "./middlewares/errorHandler.middleware.js";
 
 dotenv.config();
 
@@ -26,6 +28,7 @@ app.use(cors({
   credentials: true 
 }));
 app.use(express.json());
+app.use(requestLogger); // Log de todas las peticiones
 
 app.get("/health", async (_req, res) => {
   try {
@@ -36,6 +39,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 
+// Rutas de la API
 app.use("/api/auth", authRoutes);
 app.use("/api/pigs", pigsRoutes);
 app.use("/api/reproduccion", reproduccionRoutes);
@@ -44,8 +48,11 @@ app.use("/api/produccion", produccionRoutes);
 app.use("/api/nutricion", nutricionRoutes);
 app.use("/api/perfil", perfilRoutes);
 
-app.use((req, res) => res.status(404).json({ error: "Not found" }));
+// Manejo de errores (debe ir al final)
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`API AGROFARM running on http://localhost:${PORT}`);
+  console.log(`🚀 API AGROFARM corriendo en http://localhost:${PORT}`);
+  console.log(`📊 Ambiente: ${process.env.NODE_ENV || 'development'}`);
 });
