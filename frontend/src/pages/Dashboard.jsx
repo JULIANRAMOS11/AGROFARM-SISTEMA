@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import PigForm from "../components/PigForm";
 import PigList from "../components/PigList";
+import Reproduccion from "./Reproduccion";
+import Sanidad from "./Sanidad";
+import Produccion from "./Produccion";
+import Nutricion from "./Nutricion";
+import Perfil from "./Perfil";
 
 export default function Dashboard() {
   const [pigs, setPigs] = useState([]);
@@ -216,9 +221,12 @@ export default function Dashboard() {
           )}
 
           {["reproduction", "health", "production", "nutrition", "profile"].includes(activeSection) && (
-            <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{getSectionTitle()}</h3>
-              <p className="text-gray-600">Esta sección está en desarrollo. Próximamente disponible.</p>
+            <div>
+              {activeSection === "reproduction" && <Reproduccion />}
+              {activeSection === "health" && <Sanidad />}
+              {activeSection === "production" && <Produccion />}
+              {activeSection === "nutrition" && <Nutricion />}
+              {activeSection === "profile" && <Perfil />}
             </div>
           )}
           

@@ -13,11 +13,11 @@ export default function Sidebar({ activeSection, onSectionChange, isMobileOpen, 
   const sections = [
     { id: "dashboard", label: "Dashboard", icon: "fa-chart-pie", category: "Principal" },
     { id: "pigs", label: "Cerdos", icon: "fa-paw", category: "Gestión" },
-    { id: "reproduction", label: "Reproducción", icon: "fa-venus-mars", category: "Gestión" },
-    { id: "health", label: "Sanidad", icon: "fa-user-md", category: "Gestión" },
-    { id: "production", label: "Producción", icon: "fa-industry", category: "Gestión" },
-    { id: "nutrition", label: "Nutrición", icon: "fa-utensils", category: "Gestión" },
-    { id: "profile", label: "Perfil", icon: "fa-user-circle", category: "Gestión" },
+    { id: "reproduction", label: "Reproducción", icon: "fa-baby", category: "Gestión" },
+    { id: "health", label: "Sanidad", icon: "fa-heart-pulse", category: "Gestión" },
+    { id: "production", label: "Producción", icon: "fa-chart-line", category: "Gestión" },
+    { id: "nutrition", label: "Nutrición", icon: "fa-apple-whole", category: "Gestión" },
+    { id: "profile", label: "Perfil", icon: "fa-user-circle", category: "Cuenta" },
   ];
 
   const handleSectionClick = (sectionId) => {
@@ -83,6 +83,25 @@ export default function Sidebar({ activeSection, onSectionChange, isMobileOpen, 
           <p className="px-2 text-xs font-semibold text-green-200/80 uppercase tracking-wider mt-6 mb-2">Gestión</p>
           
           {sections.filter(s => s.category === "Gestión").map(section => (
+            <button 
+              key={section.id}
+              onClick={() => handleSectionClick(section.id)}
+              className={`
+                group w-full text-left flex items-center gap-3 px-4 py-3 
+                text-sm font-semibold rounded-xl transition-colors
+                ${activeSection === section.id 
+                  ? 'bg-white/20 text-white' 
+                  : 'hover:bg-white/10'}
+              `}
+            >
+              <i className={`fas ${section.icon} w-5 text-green-300 group-hover:animate-bounce`}></i>
+              {section.label}
+            </button>
+          ))}
+
+          <p className="px-2 text-xs font-semibold text-green-200/80 uppercase tracking-wider mt-6 mb-2">Cuenta</p>
+          
+          {sections.filter(s => s.category === "Cuenta").map(section => (
             <button 
               key={section.id}
               onClick={() => handleSectionClick(section.id)}
