@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000/api";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
@@ -20,9 +20,17 @@ export default function Perfil() {
   });
 
   useEffect(() => {
-    const username = localStorage.getItem("username");
-    if (username) {
-      fetchPerfil(username);
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const userData = JSON.parse(userString);
+        const username = userData.username;
+        if (username) {
+          fetchPerfil(username);
+        }
+      } catch (error) {
+        console.error("Error al parsear usuario:", error);
+      }
     }
   }, []);
 
