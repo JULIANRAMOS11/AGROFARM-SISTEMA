@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
 
@@ -63,8 +64,10 @@ export default function Produccion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Registro de producción creado exitosamente");
+        toast.success("Registro de producción creado exitosamente");
         setShowForm(false);
         fetchRegistros();
         fetchEstadisticas();
@@ -79,9 +82,12 @@ export default function Produccion() {
           lote: "",
           observaciones: ""
         });
+      } else {
+        toast.error(data.error || "Error al crear registro");
       }
     } catch (error) {
       console.error("Error al crear registro:", error);
+      toast.error("Error de conexión");
     }
   };
 
@@ -92,12 +98,15 @@ export default function Produccion() {
           method: "DELETE"
         });
         if (res.ok) {
-          alert("Registro eliminado");
+          toast.success("Registro eliminado");
           fetchRegistros();
           fetchEstadisticas();
+        } else {
+          toast.error("Error al eliminar registro");
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
+        toast.error("Error de conexión");
       }
     }
   };
@@ -184,6 +193,7 @@ export default function Produccion() {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 required
                 placeholder="0.00"
+                min="0"
               />
             </div>
             <div>
@@ -193,6 +203,7 @@ export default function Produccion() {
                 value={formData.edad_dias}
                 onChange={(e) => setFormData({ ...formData, edad_dias: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                min="0"
               />
             </div>
             <div>
@@ -204,6 +215,7 @@ export default function Produccion() {
                 onChange={(e) => setFormData({ ...formData, ganancia_diaria: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="0.000"
+                step="0.001"
               />
             </div>
             <div>
@@ -215,6 +227,7 @@ export default function Produccion() {
                 onChange={(e) => setFormData({ ...formData, consumo_alimento_kg: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="0.00"
+                min="0"
               />
             </div>
             <div>
@@ -226,6 +239,7 @@ export default function Produccion() {
                 onChange={(e) => setFormData({ ...formData, conversion_alimenticia: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="0.00"
+                min="0"
               />
             </div>
             <div>

@@ -25,7 +25,7 @@ export const getSanidadById = async (req, res) => {
       LEFT JOIN pigs p ON s.pig_id = p.id
       WHERE s.id = $1
     `, [id]);
-    
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
@@ -67,6 +67,17 @@ export const createSanidad = async (req, res) => {
       observaciones
     } = req.body;
 
+    // 1. Validar existencia del cerdo
+    const pigCheck = await pool.query("SELECT id FROM pigs WHERE id = $1", [pig_id]);
+    if (pigCheck.rows.length === 0) {
+      return res.status(404).json({ error: "El cerdo especificado no existe." });
+    }
+
+    // 2. Validar campos requeridos mínimos
+    if (!medicamento_vacuna && !tratamiento) {
+      return res.status(400).json({ error: "Debe especificar al menos un medicamento/vacuna o un tratamiento." });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO sanidad 
        (pig_id, tipo, fecha, medicamento_vacuna, dosis, via_administracion, 
@@ -74,12 +85,13 @@ export const createSanidad = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
       [pig_id, tipo, fecha, medicamento_vacuna, dosis, via_administracion,
-       veterinario, diagnostico, tratamiento, costo, proxima_aplicacion, observaciones]
+        veterinario, diagnostico, tratamiento, costo, proxima_aplicacion, observaciones]
     );
 
     res.status(201).json(rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en createSanidad:", error);
+    res.status(500).json({ ok: false, error: "Error interno del servidor", detail: error.message });
   }
 };
 
@@ -110,7 +122,7 @@ export const updateSanidad = async (req, res) => {
        WHERE id = $13
        RETURNING *`,
       [pig_id, tipo, fecha, medicamento_vacuna, dosis, via_administracion,
-       veterinario, diagnostico, tratamiento, costo, proxima_aplicacion, observaciones, id]
+        veterinario, diagnostico, tratamiento, costo, proxima_aplicacion, observaciones, id]
     );
 
     if (rows.length === 0) {

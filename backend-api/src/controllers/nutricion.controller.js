@@ -22,7 +22,7 @@ export const getAlimentoById = async (req, res) => {
       "SELECT * FROM alimentacion WHERE id = $1",
       [id]
     );
-    
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "Alimento no encontrado" });
     }
@@ -158,6 +158,27 @@ export const createConsumo = async (req, res) => {
       observaciones
     } = req.body;
 
+    if (!alimento_id || !cantidad_kg || cantidad_kg <= 0) {
+      return res.status(400).json({ error: "Debe especificar un alimento y una cantidad válida mayor a 0." });
+    }
+
+    // 1. Validar Stock Suficiente
+    const stockCheck = await pool.query("SELECT nombre_alimento, stock_kg FROM alimentacion WHERE id = $1", [alimento_id]);
+
+    if (stockCheck.rows.length === 0) {
+      return res.status(404).json({ error: "El alimento especificado no existe." });
+    }
+
+    const { nombre_alimento, stock_kg } = stockCheck.rows[0];
+
+    // Convertir a float para asegurar comparación numérica
+    if (parseFloat(stock_kg) < parseFloat(cantidad_kg)) {
+      return res.status(400).json({
+        error: `Stock insuficiente para ${nombre_alimento}.`,
+        detail: `Intentaste retirar ${cantidad_kg}kg, pero solo quedan ${stock_kg}kg disponibles.`
+      });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO consumo_alimento 
        (pig_id, alimento_id, fecha, cantidad_kg, lote, observaciones)
@@ -167,16 +188,15 @@ export const createConsumo = async (req, res) => {
     );
 
     // Actualizar stock del alimento
-    if (alimento_id && cantidad_kg) {
-      await pool.query(
-        "UPDATE alimentacion SET stock_kg = stock_kg - $1 WHERE id = $2",
-        [cantidad_kg, alimento_id]
-      );
-    }
+    await pool.query(
+      "UPDATE alimentacion SET stock_kg = stock_kg - $1 WHERE id = $2",
+      [cantidad_kg, alimento_id]
+    );
 
     res.status(201).json(rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en createConsumo:", error);
+    res.status(500).json({ ok: false, error: "Error interno del servidor", detail: error.message });
   }
 };
 
@@ -215,13 +235,13 @@ export const updateConsumo = async (req, res) => {
     if (oldRows.length > 0) {
       const oldCantidad = oldRows[0].cantidad_kg;
       const oldAlimentoId = oldRows[0].alimento_id;
-      
+
       // Devolver cantidad anterior
       await pool.query(
         "UPDATE alimentacion SET stock_kg = stock_kg + $1 WHERE id = $2",
         [oldCantidad, oldAlimentoId]
       );
-      
+
       // Restar nueva cantidad
       if (alimento_id && cantidad_kg) {
         await pool.query(
@@ -241,7 +261,7 @@ export const updateConsumo = async (req, res) => {
 export const deleteConsumo = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Obtener datos antes de eliminar para ajustar stock
     const { rows: oldRows } = await pool.query(
       "SELECT cantidad_kg, alimento_id FROM consumo_alimento WHERE id = $1",

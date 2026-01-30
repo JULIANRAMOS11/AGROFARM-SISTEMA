@@ -25,7 +25,7 @@ export const getProduccionById = async (req, res) => {
       LEFT JOIN pigs p ON pr.pig_id = p.id
       WHERE pr.id = $1
     `, [id]);
-    
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
@@ -64,6 +64,21 @@ export const createProduccion = async (req, res) => {
       observaciones
     } = req.body;
 
+    // 1. Validar existencia del cerdo
+    const pigCheck = await pool.query("SELECT id FROM pigs WHERE id = $1", [pig_id]);
+    if (pigCheck.rows.length === 0) {
+      return res.status(404).json({ error: "El cerdo especificado no existe." });
+    }
+
+    // 2. Validar valores positivos (Sanity Check)
+    if (peso <= 0) return res.status(400).json({ error: "El peso debe ser mayor a 0." });
+    if (edad_dias < 0) return res.status(400).json({ error: "La edad no puede ser negativa." });
+
+    // Opcional: Validar fecha no futura
+    if (new Date(fecha) > new Date()) {
+      return res.status(400).json({ error: "No se pueden registrar datos de producción con fecha futura." });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO produccion 
        (pig_id, fecha, peso, edad_dias, ganancia_diaria, consumo_alimento_kg,
@@ -71,7 +86,7 @@ export const createProduccion = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [pig_id, fecha, peso, edad_dias, ganancia_diaria, consumo_alimento_kg,
-       conversion_alimenticia, lote, observaciones]
+        conversion_alimenticia, lote, observaciones]
     );
 
     // Actualizar peso actual del cerdo
@@ -84,7 +99,8 @@ export const createProduccion = async (req, res) => {
 
     res.status(201).json(rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en createProduccion:", error);
+    res.status(500).json({ ok: false, error: "Error interno del servidor", detail: error.message });
   }
 };
 
@@ -111,7 +127,7 @@ export const updateProduccion = async (req, res) => {
        WHERE id = $10
        RETURNING *`,
       [pig_id, fecha, peso, edad_dias, ganancia_diaria, consumo_alimento_kg,
-       conversion_alimenticia, lote, observaciones, id]
+        conversion_alimenticia, lote, observaciones, id]
     );
 
     if (rows.length === 0) {

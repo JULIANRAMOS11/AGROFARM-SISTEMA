@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
 
@@ -9,7 +10,7 @@ export default function Nutricion() {
   const [pigs, setPigs] = useState([]);
   const [showAlimentoForm, setShowAlimentoForm] = useState(false);
   const [showConsumoForm, setShowConsumoForm] = useState(false);
-  
+
   const [alimentoData, setAlimentoData] = useState({
     nombre_alimento: "",
     tipo: "CRECIMIENTO",
@@ -73,8 +74,10 @@ export default function Nutricion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(alimentoData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Alimento creado exitosamente");
+        toast.success("Alimento creado exitosamente");
         setShowAlimentoForm(false);
         fetchAlimentos();
         setAlimentoData({
@@ -86,9 +89,12 @@ export default function Nutricion() {
           stock_kg: "",
           observaciones: ""
         });
+      } else {
+        toast.error(data.error || "Error al crear alimento");
       }
     } catch (error) {
       console.error("Error al crear alimento:", error);
+      toast.error("Error de conexión");
     }
   };
 
@@ -100,8 +106,10 @@ export default function Nutricion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(consumoData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Consumo registrado exitosamente");
+        toast.success("Consumo registrado exitosamente");
         setShowConsumoForm(false);
         fetchConsumos();
         fetchAlimentos(); // Actualizar stock
@@ -113,9 +121,16 @@ export default function Nutricion() {
           lote: "",
           observaciones: ""
         });
+      } else {
+        // Mostrar error detallado si existe (ej: Stock insuficiente)
+        toast.error(data.detail || data.error || "Error al registrar consumo", {
+          duration: 5000,
+          style: { border: '1px solid #EF4444', color: '#B91C1C' }
+        });
       }
     } catch (error) {
       console.error("Error al registrar consumo:", error);
+      toast.error("Error de conexión");
     }
   };
 
@@ -126,11 +141,14 @@ export default function Nutricion() {
           method: "DELETE"
         });
         if (res.ok) {
-          alert("Alimento eliminado");
+          toast.success("Alimento eliminado");
           fetchAlimentos();
+        } else {
+          toast.error("Error al eliminar alimento");
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
+        toast.error("Error de conexión");
       }
     }
   };
@@ -158,21 +176,19 @@ export default function Nutricion() {
       <div className="flex gap-4 mb-6 border-b border-gray-200">
         <button
           onClick={() => setActiveTab("alimentos")}
-          className={`pb-2 px-4 font-semibold ${
-            activeTab === "alimentos"
+          className={`pb-2 px-4 font-semibold ${activeTab === "alimentos"
               ? "border-b-2 border-green-600 text-green-600"
               : "text-gray-600"
-          }`}
+            }`}
         >
           Catálogo de Alimentos
         </button>
         <button
           onClick={() => setActiveTab("consumos")}
-          className={`pb-2 px-4 font-semibold ${
-            activeTab === "consumos"
+          className={`pb-2 px-4 font-semibold ${activeTab === "consumos"
               ? "border-b-2 border-green-600 text-green-600"
               : "text-gray-600"
-          }`}
+            }`}
         >
           Registro de Consumo
         </button>
@@ -225,6 +241,7 @@ export default function Nutricion() {
                     value={alimentoData.proteina_porcentaje}
                     onChange={(e) => setAlimentoData({ ...alimentoData, proteina_porcentaje: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div>
@@ -235,6 +252,7 @@ export default function Nutricion() {
                     value={alimentoData.costo_por_kg}
                     onChange={(e) => setAlimentoData({ ...alimentoData, costo_por_kg: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div>
@@ -254,6 +272,7 @@ export default function Nutricion() {
                     value={alimentoData.stock_kg}
                     onChange={(e) => setAlimentoData({ ...alimentoData, stock_kg: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div className="col-span-2">
@@ -392,6 +411,7 @@ export default function Nutricion() {
                     onChange={(e) => setConsumoData({ ...consumoData, cantidad_kg: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                     required
+                    min="0.1"
                   />
                 </div>
                 <div>

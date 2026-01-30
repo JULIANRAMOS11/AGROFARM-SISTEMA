@@ -25,7 +25,7 @@ export const getReproduccionById = async (req, res) => {
       LEFT JOIN pigs p ON r.pig_id = p.id
       WHERE r.id = $1
     `, [id]);
-    
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
@@ -48,6 +48,29 @@ export const createReproduccion = async (req, res) => {
       observaciones
     } = req.body;
 
+    // 1. Validar que la cerda exista y sea HEMBRA
+    const pigCheck = await pool.query("SELECT sexo FROM pigs WHERE id = $1", [pig_id]);
+
+    if (pigCheck.rows.length === 0) {
+      return res.status(404).json({ error: "La cerda especificada no existe." });
+    }
+
+    if (pigCheck.rows[0].sexo !== 'Hembra') {
+      return res.status(400).json({ error: "Solo se pueden registrar servicios a cerdas (Hembras)." });
+    }
+
+    // 2. Validar que no tenga un proceso reproductivo activo (GESTANTE o CONFIRMADA)
+    const activeService = await pool.query(
+      "SELECT id FROM reproduccion WHERE pig_id = $1 AND estado IN ('GESTANTE', 'CONFIRMADA')",
+      [pig_id]
+    );
+
+    if (activeService.rows.length > 0) {
+      return res.status(400).json({
+        error: "Esta cerda ya tiene un proceso reproductivo activo (Gestante o Confirmada). Registre el parto o finalice el proceso actual antes de iniciar uno nuevo."
+      });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO reproduccion 
        (pig_id, tipo_servicio, fecha_servicio, verraco, fecha_probable_parto, estado, observaciones)
@@ -58,7 +81,8 @@ export const createReproduccion = async (req, res) => {
 
     res.status(201).json(rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en createReproduccion:", error);
+    res.status(500).json({ ok: false, error: "Error interno del servidor", detail: error.message });
   }
 };
 
@@ -146,6 +170,27 @@ export const createParto = async (req, res) => {
       observaciones
     } = req.body;
 
+    // 1. Validar proceso reproductivo previo
+    if (reproduccion_id) {
+      const reproCheck = await pool.query("SELECT estado FROM reproduccion WHERE id = $1", [reproduccion_id]);
+
+      if (reproCheck.rows.length === 0) {
+        return res.status(404).json({ error: "El servicio de reproducción especificado no existe." });
+      }
+
+      const estadoActual = reproCheck.rows[0].estado;
+      if (estadoActual !== 'GESTANTE' && estadoActual !== 'CONFIRMADA') {
+        return res.status(400).json({
+          error: `No se puede registrar parto para un servicio en estado '${estadoActual}'. Debe estar GESTANTE o CONFIRMADA.`
+        });
+      }
+    } else {
+      // Opcional: Impedir partos "huérfanos" (sin servicio asociado) si la regla de negocio lo exige estricto.
+      // Por ahora permitimos partos históricos manuales, pero con advertencia si fuera frontend.
+      // Si la regla dice "NO partos sin servicio":
+      // return res.status(400).json({ error: "Debe asociar un servicio de reproducción (monta/inseminación) válido." });
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO partos 
        (reproduccion_id, pig_id, fecha_parto, lechones_nacidos_vivos, lechones_nacidos_muertos,
@@ -153,7 +198,7 @@ export const createParto = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [reproduccion_id, pig_id, fecha_parto, lechones_nacidos_vivos, lechones_nacidos_muertos,
-       lechones_momificados, peso_promedio_lechon, observaciones]
+        lechones_momificados, peso_promedio_lechon, observaciones]
     );
 
     // Actualizar estado de reproducción a PARTO_REALIZADO
@@ -164,9 +209,15 @@ export const createParto = async (req, res) => {
       );
     }
 
+    // Opcional: Actualizar etapa del cerdo a 'LACTANCIA' automáticamente
+    if (pig_id) {
+      await pool.query("UPDATE pigs SET etapa = 'LACTANCIA' WHERE id = $1", [pig_id]);
+    }
+
     res.status(201).json(rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en createParto:", error);
+    res.status(500).json({ ok: false, error: "Error interno del servidor", detail: error.message });
   }
 };
 
@@ -193,7 +244,7 @@ export const updateParto = async (req, res) => {
        WHERE id = $9
        RETURNING *`,
       [reproduccion_id, pig_id, fecha_parto, lechones_nacidos_vivos, lechones_nacidos_muertos,
-       lechones_momificados, peso_promedio_lechon, observaciones, id]
+        lechones_momificados, peso_promedio_lechon, observaciones, id]
     );
 
     if (rows.length === 0) {

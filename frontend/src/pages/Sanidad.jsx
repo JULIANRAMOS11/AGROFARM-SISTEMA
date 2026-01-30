@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
 
@@ -54,8 +55,10 @@ export default function Sanidad() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Registro sanitario creado exitosamente");
+        toast.success("Registro sanitario creado exitosamente");
         setShowForm(false);
         fetchRegistros();
         setFormData({
@@ -72,9 +75,12 @@ export default function Sanidad() {
           proxima_aplicacion: "",
           observaciones: ""
         });
+      } else {
+        toast.error(data.error || "Error al crear registro");
       }
     } catch (error) {
       console.error("Error al crear registro:", error);
+      toast.error("Error de conexión");
     }
   };
 
@@ -85,11 +91,14 @@ export default function Sanidad() {
           method: "DELETE"
         });
         if (res.ok) {
-          alert("Registro eliminado");
+          toast.success("Registro eliminado");
           fetchRegistros();
+        } else {
+          toast.error("Error al eliminar registro");
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
+        toast.error("Error de conexión");
       }
     }
   };
@@ -215,6 +224,7 @@ export default function Sanidad() {
                 onChange={(e) => setFormData({ ...formData, costo: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="0.00"
+                min="0"
               />
             </div>
             <div>

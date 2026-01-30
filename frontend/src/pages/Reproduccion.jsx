@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
 
@@ -73,8 +74,10 @@ export default function Reproduccion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Servicio registrado exitosamente");
+        toast.success("Servicio registrado exitosamente");
         setShowForm(false);
         fetchServicios();
         setFormData({
@@ -86,9 +89,12 @@ export default function Reproduccion() {
           estado: "GESTANTE",
           observaciones: ""
         });
+      } else {
+        toast.error(data.error || "Error al registrar servicio");
       }
     } catch (error) {
       console.error("Error al crear servicio:", error);
+      toast.error("Error de conexión al servidor");
     }
   };
 
@@ -100,8 +106,10 @@ export default function Reproduccion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(partoData)
       });
+      const data = await res.json();
+
       if (res.ok) {
-        alert("Parto registrado exitosamente");
+        toast.success("Parto registrado exitosamente");
         setShowPartoForm(false);
         fetchPartos();
         fetchServicios();
@@ -115,9 +123,12 @@ export default function Reproduccion() {
           peso_promedio_lechon: "",
           observaciones: ""
         });
+      } else {
+        toast.error(data.error || "Error al registrar parto");
       }
     } catch (error) {
       console.error("Error al registrar parto:", error);
+      toast.error("Error de conexión al servidor");
     }
   };
 
@@ -128,11 +139,15 @@ export default function Reproduccion() {
           method: "DELETE"
         });
         if (res.ok) {
-          alert("Registro eliminado");
+          toast.success("Registro eliminado");
           fetchServicios();
+        } else {
+          const data = await res.json();
+          toast.error(data.error || "Error al eliminar");
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
+        toast.error("Error de conexión");
       }
     }
   };
@@ -159,21 +174,19 @@ export default function Reproduccion() {
       <div className="flex gap-4 mb-6 border-b border-gray-200">
         <button
           onClick={() => setActiveTab("servicios")}
-          className={`pb-2 px-4 font-semibold ${
-            activeTab === "servicios"
+          className={`pb-2 px-4 font-semibold ${activeTab === "servicios"
               ? "border-b-2 border-green-600 text-green-600"
               : "text-gray-600"
-          }`}
+            }`}
         >
           Servicios
         </button>
         <button
           onClick={() => setActiveTab("partos")}
-          className={`pb-2 px-4 font-semibold ${
-            activeTab === "partos"
+          className={`pb-2 px-4 font-semibold ${activeTab === "partos"
               ? "border-b-2 border-green-600 text-green-600"
               : "text-gray-600"
-          }`}
+            }`}
         >
           Partos
         </button>
@@ -374,6 +387,7 @@ export default function Reproduccion() {
                     value={partoData.lechones_nacidos_vivos}
                     onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_vivos: parseInt(e.target.value) })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div>
@@ -383,6 +397,7 @@ export default function Reproduccion() {
                     value={partoData.lechones_nacidos_muertos}
                     onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_muertos: parseInt(e.target.value) })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div>
@@ -392,6 +407,7 @@ export default function Reproduccion() {
                     value={partoData.lechones_momificados}
                     onChange={(e) => setPartoData({ ...partoData, lechones_momificados: parseInt(e.target.value) })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div>
@@ -402,6 +418,7 @@ export default function Reproduccion() {
                     value={partoData.peso_promedio_lechon}
                     onChange={(e) => setPartoData({ ...partoData, peso_promedio_lechon: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    min="0"
                   />
                 </div>
                 <div className="col-span-2">
