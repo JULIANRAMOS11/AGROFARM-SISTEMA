@@ -1,0 +1,5 @@
+backend-api/
+legacy/
+docs/
+*.md
+!frontend/README.md
