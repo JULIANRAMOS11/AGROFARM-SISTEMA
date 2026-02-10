@@ -30,10 +30,20 @@ app.use(cors({
 app.use(express.json());
 app.use(requestLogger); // Log de todas las peticiones
 
-app.get("/health", async (_req, res) => {
+// Health check endpoints (ligeros para mantener el servidor activo)
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, status: "alive", timestamp: new Date().toISOString() });
+});
+
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true, status: "alive", timestamp: new Date().toISOString() });
+});
+
+// Health check completo con DB (opcional)
+app.get("/api/health/db", async (_req, res) => {
   try {
     const { rows } = await pool.query("SELECT NOW() AS now");
-    res.json({ ok: true, now: rows[0].now });
+    res.json({ ok: true, database: "connected", now: rows[0].now });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
