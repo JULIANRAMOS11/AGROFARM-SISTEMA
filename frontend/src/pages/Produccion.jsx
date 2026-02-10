@@ -215,7 +215,6 @@ export default function Produccion() {
                 onChange={(e) => setFormData({ ...formData, ganancia_diaria: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="0.000"
-                step="0.001"
               />
             </div>
             <div>
