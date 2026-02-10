@@ -37,9 +37,11 @@ ON public.partos (reproduccion_id, fecha_parto);
 -- =============================================================================
 -- Útil si la UI permite buscar cerdos por código con LIKE '%abc%'
 -- Aumenta espacio usado pero mejora significativamente búsquedas tipo "contiene"
+-- NOTA: Comentado porque gin_trgm_ops requiere configuración específica en Supabase
+-- El índice btree regular (idx_pigs_arete) es suficiente para búsquedas exactas
 
-CREATE INDEX IF NOT EXISTS idx_pigs_codigo_arete_trgm 
-ON public.pigs USING gin (codigo_arete gin_trgm_ops);
+-- CREATE INDEX IF NOT EXISTS idx_pigs_codigo_arete_trgm 
+-- ON public.pigs USING gin (codigo_arete gin_trgm_ops);
 
 -- =============================================================================
 -- PARTE 4: ÍNDICES PARA FILTROS COMBINADOS
