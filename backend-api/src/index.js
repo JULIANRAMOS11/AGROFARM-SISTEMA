@@ -31,13 +31,15 @@ app.use(express.json());
 app.use(requestLogger); // Log de todas las peticiones
 
 // Health check endpoints (ligeros para mantener el servidor activo)
-app.get("/health", (_req, res) => {
+const healthResponse = (_req, res) => {
   res.json({ ok: true, status: "alive", timestamp: new Date().toISOString() });
-});
+};
 
-app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, status: "alive", timestamp: new Date().toISOString() });
-});
+app.get("/health", healthResponse);
+app.head("/health", healthResponse);
+
+app.get("/api/health", healthResponse);
+app.head("/api/health", healthResponse);
 
 // Health check completo con DB (opcional)
 app.get("/api/health/db", async (_req, res) => {
