@@ -1,81 +1,275 @@
-# AGROFARM-SISTEMA
+# 🐷 AGROFARM - Sistema Integral de Gestión Porcina
 
-Suite completa: frontend React, backend Express/PostgreSQL (Supabase) y documentación para despliegue.
+![Version](https://img.shields.io/badge/version-1.0.0-green)
+![React](https://img.shields.io/badge/React-19.2.1-blue)
+![Node](https://img.shields.io/badge/Node.js-18+-green)
+![Android](https://img.shields.io/badge/Android-Java-orange)
 
-## Estructura
-- `frontend/` React CRA, router con `HashRouter` para GitHub Pages.
-- `backend-api/` API principal (Express + pg).
-- `docs/postman/` Colección y environment para pruebas.
-- `docs/deployment.md` Pasos de hosting.
-- `legacy/` Referencias históricas (`api-login/` y HTML antiguo).
+Sistema multiplataforma (Web + Móvil Android) para la gestión integral de granjas porcinas con sincronización en tiempo real.
 
-## Requisitos
-- Node.js 18+ y npm.
-- Cuenta Supabase (PostgreSQL) y URL pooler.
-- Cuentas en GitHub (GH Pages) y Render/Railway para backend.
+---
 
-## Setup rápido
-1) Clonar este repo en `C:\Proyectos\AGROFARM-SISTEMA`.
-2) Backend:
-   - Copiar `.env.example` -> `.env` y completar `DATABASE_URL`, `FRONTEND_ORIGIN`.
-   - `cd backend-api && npm install`.
-   - Crear tablas en Supabase (SQL abajo).
-   - `npm start` (o `npm run dev` si agregas nodemon).
-3) Frontend:
-   - Copiar `.env.example` -> `.env` y ajustar `REACT_APP_API_BASE_URL`.
-   - `cd frontend && npm install`.
-   - `npm start` para desarrollo.
-   - `npm run deploy` para publicar en GH Pages.
-4) Postman:
-   - Importar colección y environment desde `docs/postman/`.
-   - Setear variable `BASE_URL` al backend (`http://localhost:4000/api` o URL en Render/Railway).
+## 🎯 ¿Qué es AGROFARM?
 
-## Variables de entorno
-- Backend (`backend-api/.env`):
-  - `PORT`: puerto local, ej. 4000
-  - `DATABASE_URL`: cadena completa de Supabase (pooler)
-  - `FRONTEND_ORIGIN`: lista separada por comas de orígenes permitidos (dev + GH Pages)
-- Frontend (`frontend/.env`):
-  - `REACT_APP_API_BASE_URL`: base de la API (`/api`)
+**AGROFARM** es un sistema profesional que digitaliza y automatiza el control completo de granjas porcinas:
 
-## SQL inicial (Supabase)
-```sql
-CREATE TABLE users (
-  id serial PRIMARY KEY,
-  username text UNIQUE NOT NULL,
-  password_hash text NOT NULL,
-  role text NOT NULL DEFAULT 'USER',
-  created_at timestamptz DEFAULT now()
-);
+- 🐖 **Gestión de Cerdos**: Inventario completo con trazabilidad
+- 👶 **Reproducción**: Control de montas, partos y lechones
+- 💉 **Sanidad**: Tratamientos veterinarios y vacunas
+- 📊 **Producción**: Pesajes y ganancia de peso
+- 🌾 **Nutrición**: Inventario de alimentos y consumos
+- 📈 **Dashboard**: Estadísticas en tiempo real
 
-CREATE TABLE pigs (
-  id serial PRIMARY KEY,
-  codigo_arete text NOT NULL,
-  sexo text NOT NULL,
-  fecha_nacimiento date NOT NULL,
-  estado text DEFAULT 'ACTIVO',
-  etapa text DEFAULT 'DESCONOCIDA',
-  peso_actual numeric DEFAULT 0,
-  lote text DEFAULT 'SIN_LOTE',
-  created_at timestamptz DEFAULT now()
-);
+---
+
+## 🌐 URLs de Producción
+
+- **🌍 Web Frontend**: https://agrofarm-sistema.vercel.app
+- **🔌 API Backend**: https://api-agrofarm.onrender.com
+- **📊 Health Check**: https://api-agrofarm.onrender.com/api/health
+
+---
+
+## 🔑 Credenciales de Prueba
+
+```
+Username: ADMIN
+Password: admin123
 ```
 
-## Endpoints clave
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/pigs`
-- `GET /api/pigs/:id`
-- `POST /api/pigs`
-- `PUT /api/pigs/:id`
-- `PATCH /api/pigs/:id/status`
-- `DELETE /api/pigs/:id`
+---
 
-## Deploy (resumen)
-- Frontend: GitHub Pages (`npm run deploy`, usa `HashRouter`).
-- Backend: Render o Railway (Node 18, env `DATABASE_URL`, `PORT`, health `/health`).
-- BD: Supabase (plan free).
+## 📚 Documentación Completa
 
-## Legacy
-- `legacy/api-login/`: API anterior (no usar en producción).
-- `legacy/html-legacy/`: HTML estático de la primera versión.
+👉 **[Ver README Completo](./README_COMPLETO.md)** con:
+- Arquitectura detallada del sistema
+- Explicación de todas las tecnologías
+- Guías de instalación paso a paso
+- Documentación de API endpoints
+- Estructura del código
+- Y mucho más...
+
+---
+
+## 🚀 Inicio Rápido
+
+### Requisitos
+- Node.js 18+ y npm
+- Cuenta Supabase (PostgreSQL)
+- Git
+
+### Instalación
+
+**1. Clonar repositorio:**
+```bash
+git clone https://github.com/JULIANRAMOS11/AGROFARM-SISTEMA.git
+cd AGROFARM-SISTEMA
+```
+
+**2. Backend:**
+```bash
+cd backend-api
+npm install
+cp .env.example .env
+# Editar .env con tus credenciales de Supabase
+npm start
+```
+
+**3. Frontend:**
+```bash
+cd frontend
+npm install
+cp .env.example .env
+# Editar .env con la URL de tu API
+npm start
+```
+
+**4. Base de datos:**
+```bash
+# Ejecutar scripts SQL en Supabase en orden:
+# database/00_cleanup.sql
+# database/01_types_enums.sql
+# database/02_constraints.sql
+# database/03_functions_triggers.sql
+# database/04_optimizacion_indices.sql
+# database/05_datos_prueba.sql
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+AGROFARM-SISTEMA/
+├── 📁 frontend/          # React Web App
+│   ├── src/
+│   │   ├── pages/        # Dashboard, Cerdos, Reproducción, etc.
+│   │   ├── components/   # Componentes reutilizables
+│   │   └── routes/       # Rutas protegidas
+│   └── package.json
+│
+├── 📁 backend-api/       # API REST Node.js
+│   ├── src/
+│   │   ├── controllers/  # Lógica de negocio
+│   │   ├── routes/       # Endpoints
+│   │   ├── middlewares/  # Autenticación y validación
+│   │   └── config/       # Conexión DB
+│   └── database/         # Scripts SQL
+│
+├── 📁 docs/              # Documentación
+│   ├── deployment.md
+│   └── postman/          # Colección API
+│
+└── README_COMPLETO.md    # Documentación extendida
+```
+
+---
+
+## 🛠️ Tecnologías
+
+### Frontend Web
+- **React** 19.2.1
+- **Tailwind CSS**
+- **React Router DOM** 7.10.1
+- **React Hot Toast**
+- **Vercel** (Hosting)
+
+### Backend API
+- **Node.js** 18+
+- **Express** 4.21.0
+- **PostgreSQL** 15 (Supabase)
+- **bcryptjs** (Seguridad)
+- **Render.com** (Hosting)
+
+### App Móvil Android
+- **Java** (Android SDK)
+- **Material Components** 1.9.0
+- **Volley** (HTTP Client)
+- **MVVM** Architecture
+
+---
+
+## 📡 API Endpoints Principales
+
+### Autenticación
+```http
+POST /api/auth/register   # Registro de usuario
+POST /api/auth/login      # Inicio de sesión
+```
+
+### Cerdos
+```http
+GET    /api/pigs          # Listar todos
+POST   /api/pigs          # Crear cerdo
+PUT    /api/pigs/:id      # Actualizar
+PATCH  /api/pigs/:id/status  # Cambiar estado
+DELETE /api/pigs/:id      # Eliminar
+```
+
+### Reproducción
+```http
+GET  /api/reproduccion             # Listar montas
+POST /api/reproduccion             # Registrar monta
+GET  /api/reproduccion/partos/all  # Listar partos
+POST /api/reproduccion/partos      # Registrar parto
+```
+
+### Sanidad
+```http
+GET  /api/sanidad          # Tratamientos
+POST /api/sanidad          # Registrar tratamiento
+GET  /api/sanidad/proximas # Próximas vacunas
+```
+
+### Producción
+```http
+GET  /api/produccion              # Pesajes
+POST /api/produccion              # Registrar pesaje
+GET  /api/produccion/estadisticas # Estadísticas
+```
+
+### Nutrición
+```http
+GET  /api/nutricion/alimentos  # Inventario
+POST /api/nutricion/alimentos  # Crear alimento
+GET  /api/nutricion/consumos   # Consumos
+POST /api/nutricion/consumos   # Registrar consumo
+```
+
+**📖 Documentación completa**: Ver colección Postman en `docs/postman/`
+
+---
+
+## 🔒 Seguridad
+
+- ✅ Contraseñas hasheadas con bcrypt
+- ✅ Autenticación basada en tokens
+- ✅ HTTPS/TLS en todas las comunicaciones
+- ✅ CORS configurado
+- ✅ SQL Injection prevention
+- ✅ Validación de datos en backend
+
+---
+
+## 📊 Características
+
+### Funcionalidades
+- ✅ Sistema multiplataforma (Web + Móvil)
+- ✅ Sincronización en tiempo real
+- ✅ Dashboard con estadísticas
+- ✅ Control completo del ciclo de vida porcino
+- ✅ Historial completo por animal
+- ✅ Reportes y análisis
+- ✅ Diseño responsive
+
+### Técnicas
+- ✅ Arquitectura RESTful
+- ✅ Base de datos relacional
+- ✅ Deploy automático (CI/CD)
+- ✅ Escalable y mantenible
+- ✅ Documentación completa
+
+---
+
+## 👨‍💻 Autor
+
+**Julian Ramos Guarin**  
+Proyecto de Tesis - Tecnólogo en Análisis y Desarrollo de Software  
+
+🔗 GitHub: [@JULIANRAMOS11](https://github.com/JULIANRAMOS11)  
+📅 Fecha: Febrero 2026  
+
+---
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado como trabajo de grado académico.  
+Todos los derechos reservados © 2026
+
+---
+
+## 🙏 Agradecimientos
+
+Agradecimientos a la institución educativa, asesores del proyecto y comunidad de desarrolladores.
+
+---
+
+## 📞 Soporte
+
+Para más información, consultar:
+- 📖 [Documentación Completa](./README_COMPLETO.md)
+- 📚 [Guía de Deployment](./docs/deployment.md)
+- 🧪 [Colección Postman](./docs/postman/)
+
+---
+
+<div align="center">
+
+**Hecho con ❤️ para revolucionar la gestión porcina**
+
+⭐ **Si te fue útil, considera darle una estrella en GitHub** ⭐
+
+![AGROFARM](https://img.shields.io/badge/AGROFARM-Sistema%20Completo-success)
+
+</div>
+
