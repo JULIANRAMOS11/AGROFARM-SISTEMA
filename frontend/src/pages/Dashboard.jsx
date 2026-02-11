@@ -212,7 +212,7 @@ export default function Dashboard() {
                   <p className="text-sm opacity-90">Peso Promedio</p>
                   <p className="text-4xl font-bold">
                     {pigs.length > 0 
-                      ? (pigs.reduce((sum, p) => sum + p.peso_actual, 0) / pigs.length).toFixed(1)
+                      ? (pigs.reduce((sum, p) => sum + (parseFloat(p.peso_actual) || 0), 0) / pigs.length).toFixed(1)
                       : 0} kg
                   </p>
                 </div>
