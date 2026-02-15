@@ -24,6 +24,7 @@ export async function getPigById(req, res) {
 
 export async function createPig(req, res) {
   const { codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones } = req.body;
+  
   if (!codigo_arete || !sexo) {
     return res.status(400).json({ error: "codigo_arete y sexo son obligatorios" });
   }
@@ -32,17 +33,7 @@ export async function createPig(req, res) {
     const { rows } = await query(
       `INSERT INTO pigs (codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [
-        codigo_arete,
-        nombre || null,
-        raza || null,
-        sexo,
-        fecha_nacimiento || null,
-        estado || "ACTIVO",
-        peso_actual || null,
-        ubicacion || null,
-        observaciones || null,
-      ]
+      [codigo_arete, nombre || null, raza || null, sexo, fecha_nacimiento || null, estado || "ACTIVO", peso_actual || null, ubicacion || null, observaciones || null]
     );
     res.status(201).json({ mensaje: "Cerdo creado", cerdo: rows[0] });
   } catch (err) {
@@ -68,8 +59,7 @@ export async function updatePig(req, res) {
              peso_actual = COALESCE($7, peso_actual),
              ubicacion = COALESCE($8, ubicacion),
              observaciones = COALESCE($9, observaciones)
-       WHERE id = $10
-       RETURNING *`,
+       WHERE id = $10 RETURNING *`,
       [codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones, id]
     );
 
@@ -83,22 +73,19 @@ export async function updatePig(req, res) {
 export async function updatePigStatus(req, res) {
   const id = Number(req.params.id);
   const { estado } = req.body;
+  
   if (Number.isNaN(id) || !estado) {
     return res.status(400).json({ error: "ID y estado son obligatorios" });
   }
 
   try {
-    const { rows } = await query("UPDATE pigs SET estado = $1 WHERE id = $2 RETURNING *", [
-      estado,
-      id,
-    ]);
+    const { rows } = await query("UPDATE pigs SET estado = $1 WHERE id = $2 RETURNING *", [estado, id]);
     if (!rows[0]) return res.status(404).json({ error: "Cerdo no encontrado" });
     res.json({ mensaje: "Estado actualizado", cerdo: rows[0] });
   } catch (err) {
     res.status(500).json({ error: "Error actualizando estado", detail: err.message });
   }
 }
-
 export async function deletePig(req, res) {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: "ID inválido" });
