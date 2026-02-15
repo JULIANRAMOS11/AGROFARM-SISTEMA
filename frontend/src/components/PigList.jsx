@@ -1,5 +1,5 @@
 // src/components/PigList.jsx — Lista de cerdos Premium
-export default function PigList({ pigs, onToggleStatus }) {
+export default function PigList({ pigs, onToggleStatus, onEdit, onDelete }) {
   if (!pigs || pigs.length === 0) {
     return (
       <div className="text-center py-16 px-6">
@@ -47,16 +47,32 @@ export default function PigList({ pigs, onToggleStatus }) {
                 </span>
               </td>
               <td className="px-6 py-4 text-center">
-                <button
-                  onClick={() => onToggleStatus(pig.id, pig.estado)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${pig.estado === "ACTIVO"
-                      ? "text-amber-600 hover:bg-amber-50 border border-amber-200"
-                      : "text-green-600 hover:bg-green-50 border border-green-200"
-                    }`}
-                >
-                  <i className={`fas ${pig.estado === "ACTIVO" ? "fa-pause" : "fa-play"} text-[10px]`}></i>
-                  {pig.estado === "ACTIVO" ? "Desactivar" : "Activar"}
-                </button>
+                <div className="inline-flex items-center gap-2">
+                  <button
+                    onClick={() => onEdit(pig)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-blue-600 hover:bg-blue-50 border border-blue-200"
+                  >
+                    <i className="fas fa-edit text-[10px]"></i>
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => onDelete(pig.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-red-600 hover:bg-red-50 border border-red-200"
+                  >
+                    <i className="fas fa-trash text-[10px]"></i>
+                    Eliminar
+                  </button>
+                  <button
+                    onClick={() => onToggleStatus(pig.id, pig.estado)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${pig.estado === "ACTIVO"
+                        ? "text-amber-600 hover:bg-amber-50 border border-amber-200"
+                        : "text-green-600 hover:bg-green-50 border border-green-200"
+                      }`}
+                  >
+                    <i className={`fas ${pig.estado === "ACTIVO" ? "fa-pause" : "fa-play"} text-[10px]`}></i>
+                    {pig.estado === "ACTIVO" ? "Desactivar" : "Activar"}
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

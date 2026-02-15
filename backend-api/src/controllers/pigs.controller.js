@@ -23,24 +23,25 @@ export async function getPigById(req, res) {
 }
 
 export async function createPig(req, res) {
-  const { codigo_arete, sexo, fecha_nacimiento, estado, peso_actual, lote_id, etapa_id, raza_id } = req.body;
-  if (!codigo_arete || !sexo || !fecha_nacimiento) {
-    return res.status(400).json({ error: "codigo_arete, sexo y fecha_nacimiento son obligatorios" });
+  const { codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones } = req.body;
+  if (!codigo_arete || !sexo) {
+    return res.status(400).json({ error: "codigo_arete y sexo son obligatorios" });
   }
 
   try {
     const { rows } = await query(
-      `INSERT INTO pigs (codigo_arete, sexo, fecha_nacimiento, estado, peso_actual, lote_id, etapa_id, raza_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      `INSERT INTO pigs (codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         codigo_arete,
+        nombre || null,
+        raza || null,
         sexo,
-        fecha_nacimiento,
+        fecha_nacimiento || null,
         estado || "ACTIVO",
-        peso_actual ?? 0,
-        lote_id || null,
-        etapa_id || null,
-        raza_id || null,
+        peso_actual || null,
+        ubicacion || null,
+        observaciones || null,
       ]
     );
     res.status(201).json({ mensaje: "Cerdo creado", cerdo: rows[0] });
@@ -53,22 +54,23 @@ export async function updatePig(req, res) {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: "ID inválido" });
 
-  const { codigo_arete, sexo, fecha_nacimiento, estado, peso_actual, lote_id, etapa_id, raza_id } = req.body;
+  const { codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones } = req.body;
 
   try {
     const { rows } = await query(
       `UPDATE pigs
          SET codigo_arete = COALESCE($1, codigo_arete),
-             sexo = COALESCE($2, sexo),
-             fecha_nacimiento = COALESCE($3, fecha_nacimiento),
-             estado = COALESCE($4, estado),
-             peso_actual = COALESCE($5, peso_actual),
-             lote_id = COALESCE($6, lote_id),
-             etapa_id = COALESCE($7, etapa_id),
-             raza_id = COALESCE($8, raza_id)
-       WHERE id = $9
+             nombre = COALESCE($2, nombre),
+             raza = COALESCE($3, raza),
+             sexo = COALESCE($4, sexo),
+             fecha_nacimiento = COALESCE($5, fecha_nacimiento),
+             estado = COALESCE($6, estado),
+             peso_actual = COALESCE($7, peso_actual),
+             ubicacion = COALESCE($8, ubicacion),
+             observaciones = COALESCE($9, observaciones)
+       WHERE id = $10
        RETURNING *`,
-      [codigo_arete, sexo, fecha_nacimiento, estado, peso_actual, lote_id, etapa_id, raza_id, id]
+      [codigo_arete, nombre, raza, sexo, fecha_nacimiento, estado, peso_actual, ubicacion, observaciones, id]
     );
 
     if (!rows[0]) return res.status(404).json({ error: "Cerdo no encontrado" });

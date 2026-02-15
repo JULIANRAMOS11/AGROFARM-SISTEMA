@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import PigForm from "../components/PigForm";
 import PigList from "../components/PigList";
 import toast from "react-hot-toast";
-import { apiGet, apiPost, apiPatch, getUser } from "../services/api";
+import { apiGet, apiPost, apiPatch, apiPut, apiDelete, getUser } from "../services/api";
 
 export default function Dashboard() {
   const [pigs, setPigs] = useState([]);
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showPigForm, setShowPigForm] = useState(false);
+  const [editingPig, setEditingPig] = useState(null);
   const location = useLocation();
   const isNested = location.pathname !== "/dashboard";
 
@@ -25,8 +26,33 @@ export default function Dashboard() {
   useEffect(() => { loadPigs(); }, []);
 
   const handleAddPig = async (nuevoCerdo) => {
-    try { await apiPost("/pigs", nuevoCerdo); toast.success("Cerdo registrado exitosamente"); setShowPigForm(false); await loadPigs(); }
-    catch (err) { toast.error(err.message || "Error al crear el cerdo"); }
+    try { 
+      if (editingPig) {
+        await apiPut(`/pigs/${editingPig.id}`, nuevoCerdo); 
+        toast.success("Cerdo actualizado exitosamente"); 
+        setEditingPig(null);
+      } else {
+        await apiPost("/pigs", nuevoCerdo); 
+        toast.success("Cerdo registrado exitosamente"); 
+      }
+      setShowPigForm(false); 
+      await loadPigs(); 
+    }
+    catch (err) { toast.error(err.message || "Error al guardar el cerdo"); }
+  };
+
+  const handleEditPig = (pig) => {
+    setEditingPig(pig);
+    setShowPigForm(true);
+  };
+
+  const handleDeletePig = async (id) => {
+    if (!window.confirm("¿Estás seguro de eliminar este cerdo?")) return;
+    try {
+      await apiDelete(`/pigs/${id}`);
+      toast.success("Cerdo eliminado exitosamente");
+      await loadPigs();
+    } catch (err) { toast.error(err.message || "Error al eliminar"); }
   };
 
   const handleToggleStatus = async (id, currentStatus) => {
@@ -141,7 +167,7 @@ export default function Dashboard() {
                       <p className="text-xs text-gray-400">{pigs.length} registrados en total</p>
                     </div>
                   </div>
-                  <button onClick={() => setShowPigForm(!showPigForm)}
+                  <button onClick={() => { setShowPigForm(!showPigForm); setEditingPig(null); }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-300">
                     <i className={`fas ${showPigForm ? 'fa-times' : 'fa-plus'}`}></i>
                     {showPigForm ? "Cerrar" : "Nuevo Cerdo"}
@@ -151,7 +177,10 @@ export default function Dashboard() {
                 <div className="p-6 lg:p-8">
                   {showPigForm && (
                     <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-200">
-                      <PigForm onAddPig={handleAddPig} />
+                      <h3 className="text-lg font-bold text-slate-800 mb-4">
+                        {editingPig ? "🐷 Editar Cerdo" : "✨ Nuevo Cerdo"}
+                      </h3>
+                      <PigForm onAddPig={handleAddPig} initialData={editingPig} />
                     </div>
                   )}
 
@@ -171,7 +200,7 @@ export default function Dashboard() {
                   )}
 
                   {!loading && !error && (
-                    <PigList pigs={pigs} onToggleStatus={handleToggleStatus} />
+                    <PigList pigs={pigs} onToggleStatus={handleToggleStatus} onEdit={handleEditPig} onDelete={handleDeletePig} />
                   )}
                 </div>
               </div>

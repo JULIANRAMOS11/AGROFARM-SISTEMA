@@ -1,12 +1,28 @@
 // src/components/PigForm.jsx — Formulario de cerdo Premium
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function PigForm({ onAddPig, initialData }) {
-  const [formData, setFormData] = useState(initialData || {
+  const [formData, setFormData] = useState({
     codigo_arete: "", nombre: "", raza: "", sexo: "M",
     fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO",
     ubicacion: "", observaciones: ""
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        codigo_arete: initialData.codigo_arete || "",
+        nombre: initialData.nombre || "",
+        raza: initialData.raza || "",
+        sexo: initialData.sexo || "M",
+        fecha_nacimiento: initialData.fecha_nacimiento || "",
+        peso_actual: initialData.peso_actual || "",
+        estado: initialData.estado || "ACTIVO",
+        ubicacion: initialData.ubicacion || "",
+        observaciones: initialData.observaciones || ""
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

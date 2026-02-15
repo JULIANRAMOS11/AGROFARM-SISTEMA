@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { apiGet, apiPost, apiDelete } from "../services/api";
+import { apiGet, apiPost, apiPut, apiDelete } from "../services/api";
 
 export default function Sanidad() {
   const [registros, setRegistros] = useState([]);
   const [pigs, setPigs] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "",
     dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "",
@@ -24,11 +25,36 @@ export default function Sanidad() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await apiPost("/sanidad", formData);
-      toast.success("Registro sanitario creado");
+      if (editingId) {
+        await apiPut(`/sanidad/${editingId}`, formData);
+        toast.success("Registro actualizado");
+        setEditingId(null);
+      } else {
+        await apiPost("/sanidad", formData);
+        toast.success("Registro sanitario creado");
+      }
       setShowForm(false); fetchRegistros();
       setFormData({ pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "", dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "", diagnostico: "", tratamiento: "", costo: "", proxima_aplicacion: "", observaciones: "" });
     } catch (err) { toast.error(err.message || "Error"); }
+  };
+
+  const handleEdit = (registro) => {
+    setEditingId(registro.id);
+    setFormData({
+      pig_id: registro.pig_id,
+      tipo: registro.tipo,
+      fecha: registro.fecha?.split('T')[0] || "",
+      medicamento_vacuna: registro.medicamento_vacuna || "",
+      dosis: registro.dosis || "",
+      via_administracion: registro.via_administracion || "INTRAMUSCULAR",
+      veterinario: registro.veterinario || "",
+      diagnostico: registro.diagnostico || "",
+      tratamiento: registro.tratamiento || "",
+      costo: registro.costo || "",
+      proxima_aplicacion: registro.proxima_aplicacion?.split('T')[0] || "",
+      observaciones: registro.observaciones || ""
+    });
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -65,7 +91,7 @@ export default function Sanidad() {
           </h1>
           <p className="text-gray-500 mt-1">{registros.length} registros sanitarios</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)}
+        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "", dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "", diagnostico: "", tratamiento: "", costo: "", proxima_aplicacion: "", observaciones: "" }); }}
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-300">
           <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>
           {showForm ? "Cerrar" : "Nuevo Registro"}
@@ -76,7 +102,8 @@ export default function Sanidad() {
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8">
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
-            <i className="fas fa-file-medical text-emerald-500"></i>Nuevo Registro Sanitario
+            <i className="fas fa-file-medical text-emerald-500"></i>
+            {editingId ? "Editar Registro Sanitario" : "Nuevo Registro Sanitario"}
           </h3>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -137,9 +164,9 @@ export default function Sanidad() {
             </div>
             <div className="flex gap-3 mt-6 pt-5 border-t border-gray-100">
               <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
-                <i className="fas fa-save"></i>Guardar Registro
+                <i className="fas fa-save"></i>{editingId ? "Actualizar" : "Guardar"} Registro
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300">
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); }} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300">
                 Cancelar
               </button>
             </div>
@@ -183,9 +210,14 @@ export default function Sanidad() {
                     <td className="px-6 py-4 text-sm text-gray-600">{r.veterinario || <span className="text-gray-300">—</span>}</td>
                     <td className="px-6 py-4 text-sm font-semibold text-emerald-600">{r.costo ? `$${parseFloat(r.costo).toFixed(2)}` : <span className="text-gray-300">—</span>}</td>
                     <td className="px-6 py-4 text-center">
-                      <button onClick={() => handleDelete(r.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 inline-flex items-center justify-center">
-                        <i className="fas fa-trash text-xs"></i>
-                      </button>
+                      <div className="inline-flex items-center gap-2">
+                        <button onClick={() => handleEdit(r)} className="w-8 h-8 rounded-lg text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 inline-flex items-center justify-center">
+                          <i className="fas fa-edit text-xs"></i>
+                        </button>
+                        <button onClick={() => handleDelete(r.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 inline-flex items-center justify-center">
+                          <i className="fas fa-trash text-xs"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

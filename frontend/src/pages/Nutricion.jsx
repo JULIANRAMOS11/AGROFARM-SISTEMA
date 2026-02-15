@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { apiGet, apiPost, apiDelete } from "../services/api";
+import { apiGet, apiPost, apiPut, apiDelete } from "../services/api";
 
 export default function Nutricion() {
   const [tab, setTab] = useState("alimentos");
@@ -8,6 +8,8 @@ export default function Nutricion() {
   const [consumos, setConsumos] = useState([]);
   const [pigs, setPigs] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingAlimentoId, setEditingAlimentoId] = useState(null);
+  const [editingConsumoId, setEditingConsumoId] = useState(null);
   const [alimentoForm, setAlimentoForm] = useState({ nombre: "", tipo: "CONCENTRADO", marca: "", contenido_proteina: "", contenido_energia_kcal: "", precio_por_kg: "", stock_kg: "", proveedor: "", observaciones: "" });
   const [consumoForm, setConsumoForm] = useState({ pig_id: "", alimento_id: "", fecha: "", cantidad_kg: "", etapa_productiva: "CRECIMIENTO", observaciones: "" });
 
@@ -18,11 +20,62 @@ export default function Nutricion() {
 
   const handleAlimentoSubmit = async (e) => {
     e.preventDefault();
-    try { await apiPost("/nutricion/alimentos", alimentoForm); toast.success("Alimento creado"); setShowForm(false); fetchData(); setAlimentoForm({ nombre: "", tipo: "CONCENTRADO", marca: "", contenido_proteina: "", contenido_energia_kcal: "", precio_por_kg: "", stock_kg: "", proveedor: "", observaciones: "" }); } catch (err) { toast.error(err.message); }
+    try { 
+      if (editingAlimentoId) {
+        await apiPut(`/nutricion/alimentos/${editingAlimentoId}`, alimentoForm); 
+        toast.success("Alimento actualizado"); 
+        setEditingAlimentoId(null);
+      } else {
+        await apiPost("/nutricion/alimentos", alimentoForm); 
+        toast.success("Alimento creado"); 
+      }
+      setShowForm(false); fetchData(); 
+      setAlimentoForm({ nombre: "", tipo: "CONCENTRADO", marca: "", contenido_proteina: "", contenido_energia_kcal: "", precio_por_kg: "", stock_kg: "", proveedor: "", observaciones: "" }); 
+    } catch (err) { toast.error(err.message); }
   };
   const handleConsumoSubmit = async (e) => {
     e.preventDefault();
-    try { await apiPost("/nutricion/consumos", consumoForm); toast.success("Consumo registrado"); setShowForm(false); fetchData(); setConsumoForm({ pig_id: "", alimento_id: "", fecha: "", cantidad_kg: "", etapa_productiva: "CRECIMIENTO", observaciones: "" }); } catch (err) { toast.error(err.message); }
+    try { 
+      if (editingConsumoId) {
+        await apiPut(`/nutricion/consumos/${editingConsumoId}`, consumoForm); 
+        toast.success("Consumo actualizado"); 
+        setEditingConsumoId(null);
+      } else {
+        await apiPost("/nutricion/consumos", consumoForm); 
+        toast.success("Consumo registrado"); 
+      }
+      setShowForm(false); fetchData(); 
+      setConsumoForm({ pig_id: "", alimento_id: "", fecha: "", cantidad_kg: "", etapa_productiva: "CRECIMIENTO", observaciones: "" }); 
+    } catch (err) { toast.error(err.message); }
+  };
+  
+  const handleEditAlimento = (alimento) => {
+    setEditingAlimentoId(alimento.id);
+    setAlimentoForm({
+      nombre: alimento.nombre || "",
+      tipo: alimento.tipo || "CONCENTRADO",
+      marca: alimento.marca || "",
+      contenido_proteina: alimento.contenido_proteina || "",
+      contenido_energia_kcal: alimento.contenido_energia_kcal || "",
+      precio_por_kg: alimento.precio_por_kg || "",
+      stock_kg: alimento.stock_kg || "",
+      proveedor: alimento.proveedor || "",
+      observaciones: alimento.observaciones || ""
+    });
+    setShowForm(true);
+  };
+  
+  const handleEditConsumo = (consumo) => {
+    setEditingConsumoId(consumo.id);
+    setConsumoForm({
+      pig_id: consumo.pig_id,
+      alimento_id: consumo.alimento_id,
+      fecha: consumo.fecha?.split('T')[0] || "",
+      cantidad_kg: consumo.cantidad_kg || "",
+      etapa_productiva: consumo.etapa_productiva || "CRECIMIENTO",
+      observaciones: consumo.observaciones || ""
+    });
+    setShowForm(true);
   };
   const handleDelete = async (type, id) => {
     if (!window.confirm("¿Eliminar?")) return;
@@ -55,7 +108,7 @@ export default function Nutricion() {
           </h1>
           <p className="text-gray-500 mt-1">{alimentos.length} alimentos · {consumos.length} consumos</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
+        <button onClick={() => { setShowForm(!showForm); setEditingAlimentoId(null); setEditingConsumoId(null); }} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
           <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>{showForm ? "Cerrar" : "Nuevo Registro"}
         </button>
       </div>
@@ -63,7 +116,7 @@ export default function Nutricion() {
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
         {["alimentos", "consumos"].map(t => (
-          <button key={t} onClick={() => { setTab(t); setShowForm(false); }}
+          <button key={t} onClick={() => { setTab(t); setShowForm(false); setEditingAlimentoId(null); setEditingConsumoId(null); }}
             className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${tab === t ? "bg-white text-slate-800 shadow-sm" : "text-gray-500 hover:text-slate-700"}`}>
             <i className={`fas ${t === "alimentos" ? "fa-box-open" : "fa-utensils"} mr-2`}></i>
             {t === "alimentos" ? "Catálogo" : "Consumos"}
@@ -76,7 +129,10 @@ export default function Nutricion() {
         <>
           {showForm && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8">
-              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100"><i className="fas fa-box-open text-amber-500"></i>Nuevo Alimento</h3>
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+                <i className="fas fa-box-open text-amber-500"></i>
+                {editingAlimentoId ? "Editar Alimento" : "Nuevo Alimento"}
+              </h3>
               <form onSubmit={handleAlimentoSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre <span className="text-red-500">*</span></label><input type="text" value={alimentoForm.nombre} onChange={(e) => setAlimentoForm({ ...alimentoForm, nombre: e.target.value })} className={inputClass} placeholder="Ej: Concentrado Crecimiento" required /></div>
@@ -90,8 +146,10 @@ export default function Nutricion() {
                   <div className="lg:col-span-3"><label className="block text-sm font-semibold text-slate-700 mb-1.5">Observaciones</label><textarea value={alimentoForm.observaciones} onChange={(e) => setAlimentoForm({ ...alimentoForm, observaciones: e.target.value })} className={inputClass} rows="2" /></div>
                 </div>
                 <div className="flex gap-3 mt-6 pt-5 border-t border-gray-100">
-                  <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300"><i className="fas fa-save"></i>Guardar</button>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all">Cancelar</button>
+                  <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                    <i className="fas fa-save"></i>{editingAlimentoId ? "Actualizar" : "Guardar"}
+                  </button>
+                  <button type="button" onClick={() => { setShowForm(false); setEditingAlimentoId(null); }} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all">Cancelar</button>
                 </div>
               </form>
             </div>
@@ -123,7 +181,16 @@ export default function Nutricion() {
                           {a.stock_kg ? `${parseFloat(a.stock_kg).toFixed(0)} kg` : "—"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center"><button onClick={() => handleDelete("alimentos", a.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all inline-flex items-center justify-center"><i className="fas fa-trash text-xs"></i></button></td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="inline-flex items-center gap-2">
+                          <button onClick={() => handleEditAlimento(a)} className="w-8 h-8 rounded-lg text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all inline-flex items-center justify-center">
+                            <i className="fas fa-edit text-xs"></i>
+                          </button>
+                          <button onClick={() => handleDelete("alimentos", a.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all inline-flex items-center justify-center">
+                            <i className="fas fa-trash text-xs"></i>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody></table></div>
@@ -137,7 +204,10 @@ export default function Nutricion() {
         <>
           {showForm && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8">
-              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100"><i className="fas fa-utensils text-orange-500"></i>Nuevo Consumo</h3>
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+                <i className="fas fa-utensils text-orange-500"></i>
+                {editingConsumoId ? "Editar Consumo" : "Nuevo Consumo"}
+              </h3>
               <form onSubmit={handleConsumoSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cerdo <span className="text-red-500">*</span></label><select value={consumoForm.pig_id} onChange={(e) => setConsumoForm({ ...consumoForm, pig_id: e.target.value })} className={inputClass} required><option value="">Seleccione...</option>{pigs.map(p => <option key={p.id} value={p.id}>{p.codigo_arete}</option>)}</select></div>
@@ -148,8 +218,10 @@ export default function Nutricion() {
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Observaciones</label><input type="text" value={consumoForm.observaciones} onChange={(e) => setConsumoForm({ ...consumoForm, observaciones: e.target.value })} className={inputClass} /></div>
                 </div>
                 <div className="flex gap-3 mt-6 pt-5 border-t border-gray-100">
-                  <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300"><i className="fas fa-save"></i>Guardar</button>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all">Cancelar</button>
+                  <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                    <i className="fas fa-save"></i>{editingConsumoId ? "Actualizar" : "Guardar"}
+                  </button>
+                  <button type="button" onClick={() => { setShowForm(false); setEditingConsumoId(null); }} className="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all">Cancelar</button>
                 </div>
               </form>
             </div>
@@ -175,7 +247,16 @@ export default function Nutricion() {
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(c.fecha).toLocaleDateString()}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-emerald-600">{parseFloat(c.cantidad_kg).toFixed(2)} kg</td>
                       <td className="px-6 py-4"><span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">{c.etapa_productiva}</span></td>
-                      <td className="px-6 py-4 text-center"><button onClick={() => handleDelete("consumos", c.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all inline-flex items-center justify-center"><i className="fas fa-trash text-xs"></i></button></td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="inline-flex items-center gap-2">
+                          <button onClick={() => handleEditConsumo(c)} className="w-8 h-8 rounded-lg text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all inline-flex items-center justify-center">
+                            <i className="fas fa-edit text-xs"></i>
+                          </button>
+                          <button onClick={() => handleDelete("consumos", c.id)} className="w-8 h-8 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all inline-flex items-center justify-center">
+                            <i className="fas fa-trash text-xs"></i>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody></table></div>
