@@ -13,7 +13,22 @@ export default function Reproduccion() {
 
   useEffect(() => { fetchData(); }, []);
   const fetchData = async () => {
-    try { const [s, p, c] = await Promise.all([apiGet("/reproduccion/servicios"), apiGet("/reproduccion/partos"), apiGet("/pigs")]); setServicios(s); setPartos(p); setPigs(c); } catch (err) { console.error(err); }
+    try { 
+      const [s, p, c] = await Promise.all([
+        apiGet("/reproduccion/servicios"), 
+        apiGet("/reproduccion/partos"), 
+        apiGet("/pigs")
+      ]); 
+      setServicios(Array.isArray(s) ? s : []); 
+      setPartos(Array.isArray(p) ? p : []); 
+      setPigs(Array.isArray(c) ? c : []); 
+    } catch (err) { 
+      console.error("Error al cargar datos:", err);
+      toast.error("Error al cargar datos");
+      setServicios([]);
+      setPartos([]);
+      setPigs([]);
+    }
   };
 
   const handleServicioSubmit = async (e) => {
@@ -32,8 +47,8 @@ export default function Reproduccion() {
   };
 
   const inputClass = "w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all";
-  const hembras = pigs.filter(p => p.sexo === "H" || p.sexo === "Hembra" || p.sexo === "F");
-  const machos = pigs.filter(p => p.sexo === "M" || p.sexo === "Macho");
+  const hembras = (pigs || []).filter(p => p.sexo === "H" || p.sexo === "Hembra" || p.sexo === "F");
+  const machos = (pigs || []).filter(p => p.sexo === "M" || p.sexo === "Macho");
 
   const getEstadoBadge = (est) => {
     const map = { PENDIENTE: { bg: "bg-amber-100", text: "text-amber-700" }, CONFIRMADA: { bg: "bg-green-100", text: "text-green-700" }, FALLIDA: { bg: "bg-red-100", text: "text-red-700" }, PARTO_REGISTRADO: { bg: "bg-blue-100", text: "text-blue-700" } };
@@ -51,7 +66,7 @@ export default function Reproduccion() {
               <i className="fas fa-dna text-white"></i>
             </div>Reproducción
           </h1>
-          <p className="text-gray-500 mt-1">{servicios.length} servicios · {partos.length} partos</p>
+          <p className="text-gray-500 mt-1">{(servicios || []).length} servicios · {(partos || []).length} partos</p>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
           <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>{showForm ? "Cerrar" : "Nuevo Registro"}
@@ -77,8 +92,8 @@ export default function Reproduccion() {
               <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100"><i className="fas fa-heart text-pink-500"></i>Nuevo Servicio</h3>
               <form onSubmit={handleServicioSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cerda <span className="text-red-500">*</span></label><select value={servicioForm.cerda_id} onChange={(e) => setServicioForm({ ...servicioForm, cerda_id: e.target.value })} className={inputClass} required><option value="">Seleccione cerda...</option>{hembras.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.raza}</option>)}</select></div>
-                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Verraco <span className="text-red-500">*</span></label><select value={servicioForm.verraco_id} onChange={(e) => setServicioForm({ ...servicioForm, verraco_id: e.target.value })} className={inputClass} required><option value="">Seleccione verraco...</option>{machos.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.raza}</option>)}</select></div>
+                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cerda <span className="text-red-500">*</span></label><select value={servicioForm.cerda_id} onChange={(e) => setServicioForm({ ...servicioForm, cerda_id: e.target.value })} className={inputClass} required><option value="">Seleccione cerda...</option>{hembras?.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.raza}</option>)}</select></div>
+                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Verraco <span className="text-red-500">*</span></label><select value={servicioForm.verraco_id} onChange={(e) => setServicioForm({ ...servicioForm, verraco_id: e.target.value })} className={inputClass} required><option value="">Seleccione verraco...</option>{machos?.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.raza}</option>)}</select></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha <span className="text-red-500">*</span></label><input type="date" value={servicioForm.fecha_servicio} onChange={(e) => setServicioForm({ ...servicioForm, fecha_servicio: e.target.value })} className={inputClass} required /></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Tipo</label><select value={servicioForm.tipo_servicio} onChange={(e) => setServicioForm({ ...servicioForm, tipo_servicio: e.target.value })} className={inputClass}><option value="MONTA_NATURAL">Monta Natural</option><option value="INSEMINACION">Inseminación</option></select></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Técnico</label><input type="text" value={servicioForm.tecnico} onChange={(e) => setServicioForm({ ...servicioForm, tecnico: e.target.value })} className={inputClass} /></div>
@@ -93,7 +108,7 @@ export default function Reproduccion() {
           )}
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-            {servicios.length === 0 ? (
+            {!servicios || servicios.length === 0 ? (
               <div className="text-center py-16"><div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center"><i className="fas fa-heart text-pink-500 text-2xl"></i></div><p className="text-gray-500 font-medium">No hay servicios registrados</p></div>
             ) : (
               <div className="overflow-x-auto"><table className="w-full"><thead><tr className="bg-gray-50">
@@ -106,7 +121,7 @@ export default function Reproduccion() {
                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acc.</th>
               </tr></thead>
                 <tbody className="divide-y divide-gray-100">
-                  {servicios.map(s => (
+                  {(servicios || []).map(s => (
                     <tr key={s.id} className="hover:bg-green-50/50 transition-colors">
                       <td className="px-6 py-4 text-sm font-semibold text-slate-800">{s.cerda_arete}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{s.verraco_arete}</td>
@@ -131,7 +146,7 @@ export default function Reproduccion() {
               <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100"><i className="fas fa-baby text-blue-500"></i>Nuevo Parto</h3>
               <form onSubmit={handlePartoSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Servicio <span className="text-red-500">*</span></label><select value={partoForm.servicio_id} onChange={(e) => setPartoForm({ ...partoForm, servicio_id: e.target.value })} className={inputClass} required><option value="">Seleccione servicio...</option>{servicios.filter(s => s.estado !== "PARTO_REGISTRADO").map(s => <option key={s.id} value={s.id}>{s.cerda_arete} — {new Date(s.fecha_servicio).toLocaleDateString()}</option>)}</select></div>
+                  <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Servicio <span className="text-red-500">*</span></label><select value={partoForm.servicio_id} onChange={(e) => setPartoForm({ ...partoForm, servicio_id: e.target.value })} className={inputClass} required><option value="">Seleccione servicio...</option>{(servicios || []).filter(s => s.estado !== "PARTO_REGISTRADO").map(s => <option key={s.id} value={s.id}>{s.cerda_arete} — {new Date(s.fecha_servicio).toLocaleDateString()}</option>)}</select></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha Parto <span className="text-red-500">*</span></label><input type="date" value={partoForm.fecha_parto} onChange={(e) => setPartoForm({ ...partoForm, fecha_parto: e.target.value })} className={inputClass} required /></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Vivos <span className="text-red-500">*</span></label><input type="number" min="0" value={partoForm.lechones_nacidos_vivos} onChange={(e) => setPartoForm({ ...partoForm, lechones_nacidos_vivos: e.target.value })} className={inputClass} required /></div>
                   <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Muertos</label><input type="number" min="0" value={partoForm.lechones_nacidos_muertos} onChange={(e) => setPartoForm({ ...partoForm, lechones_nacidos_muertos: e.target.value })} className={inputClass} /></div>
@@ -148,7 +163,7 @@ export default function Reproduccion() {
           )}
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-            {partos.length === 0 ? (
+            {!partos || partos.length === 0 ? (
               <div className="text-center py-16"><div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center"><i className="fas fa-baby text-blue-500 text-2xl"></i></div><p className="text-gray-500 font-medium">No hay partos registrados</p></div>
             ) : (
               <div className="overflow-x-auto"><table className="w-full"><thead><tr className="bg-gray-50">
@@ -161,7 +176,7 @@ export default function Reproduccion() {
                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acc.</th>
               </tr></thead>
                 <tbody className="divide-y divide-gray-100">
-                  {partos.map(p => (
+                  {(partos || []).map(p => (
                     <tr key={p.id} className="hover:bg-green-50/50 transition-colors">
                       <td className="px-6 py-4 text-sm font-semibold text-slate-800">{p.cerda_arete}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(p.fecha_parto).toLocaleDateString()}</td>

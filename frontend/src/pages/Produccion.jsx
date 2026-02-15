@@ -13,9 +13,37 @@ export default function Produccion() {
   });
 
   useEffect(() => { fetchRegistros(); fetchPigs(); fetchEstadisticas(); }, []);
-  const fetchRegistros = async () => { try { setRegistros(await apiGet("/produccion")); } catch (err) { console.error(err); } };
-  const fetchPigs = async () => { try { setPigs(await apiGet("/pigs")); } catch (err) { console.error(err); } };
-  const fetchEstadisticas = async () => { try { setEstadisticas(await apiGet("/produccion/estadisticas")); } catch (err) { console.error(err); } };
+  
+  const fetchRegistros = async () => { 
+    try { 
+      const data = await apiGet("/produccion"); 
+      setRegistros(Array.isArray(data) ? data : []); 
+    } catch (err) { 
+      console.error("Error al cargar registros:", err); 
+      toast.error("Error al cargar registros");
+      setRegistros([]); 
+    } 
+  };
+  
+  const fetchPigs = async () => { 
+    try { 
+      const data = await apiGet("/pigs"); 
+      setPigs(Array.isArray(data) ? data : []); 
+    } catch (err) { 
+      console.error("Error al cargar cerdos:", err); 
+      setPigs([]); 
+    } 
+  };
+  
+  const fetchEstadisticas = async () => { 
+    try { 
+      const data = await apiGet("/produccion/estadisticas"); 
+      setEstadisticas(data || null); 
+    } catch (err) { 
+      console.error("Error al cargar estadísticas:", err); 
+      setEstadisticas(null); 
+    } 
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +81,7 @@ export default function Produccion() {
             </div>
             Producción
           </h1>
-          <p className="text-gray-500 mt-1">{registros.length} registros de producción</p>
+          <p className="text-gray-500 mt-1">{(registros || []).length} registros de producción</p>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
           <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>{showForm ? "Cerrar" : "Nuevo Registro"}
@@ -82,7 +110,7 @@ export default function Produccion() {
           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6 pb-4 border-b border-gray-100"><i className="fas fa-plus-circle text-emerald-500"></i>Nuevo Registro</h3>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cerdo <span className="text-red-500">*</span></label><select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className={inputClass} required><option value="">Seleccione...</option>{pigs.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.sexo}</option>)}</select></div>
+              <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cerdo <span className="text-red-500">*</span></label><select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className={inputClass} required><option value="">Seleccione...</option>{(pigs || []).map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.sexo}</option>)}</select></div>
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha <span className="text-red-500">*</span></label><input type="date" value={formData.fecha} onChange={(e) => setFormData({ ...formData, fecha: e.target.value })} className={inputClass} required /></div>
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Peso (kg) <span className="text-red-500">*</span></label><input type="number" step="0.01" value={formData.peso} onChange={(e) => setFormData({ ...formData, peso: e.target.value })} className={inputClass} required placeholder="0.00" min="0" /></div>
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Edad (días)</label><input type="number" value={formData.edad_dias} onChange={(e) => setFormData({ ...formData, edad_dias: e.target.value })} className={inputClass} min="0" /></div>
@@ -102,7 +130,7 @@ export default function Produccion() {
 
       {/* Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-        {registros.length === 0 ? (
+        {!registros || registros.length === 0 ? (
           <div className="text-center py-16 px-6">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center"><i className="fas fa-chart-line text-blue-500 text-2xl"></i></div>
             <p className="text-gray-500 font-medium">No hay registros de producción</p><p className="text-sm text-gray-400 mt-1">Comienza agregando un registro</p>
@@ -122,7 +150,7 @@ export default function Produccion() {
                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acc.</th>
               </tr></thead>
               <tbody className="divide-y divide-gray-100">
-                {registros.map(r => (
+                {(registros || []).map(r => (
                   <tr key={r.id} className="hover:bg-green-50/50 transition-colors">
                     <td className="px-6 py-4 text-sm font-semibold text-slate-800">{r.codigo_arete}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{new Date(r.fecha).toLocaleDateString()}</td>
