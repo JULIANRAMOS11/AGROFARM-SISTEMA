@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+═══════════════════════════════════════════════════════════════════
+network_security_config.xml
+═══════════════════════════════════════════════════════════════════
+INSTRUCCIONES: Crear archivo en: app/src/main/res/xml/network_security_config.xml
+
+Este archivo permite conexiones HTTP (no solo HTTPS) para desarrollo local
+-->
+<network-security-config>
+    
+    <!-- Configuración base para todas las conexiones -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Dominios específicos con tráfico cleartext permitido -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- API de AGROFARM en Render (HTTPS, pero por si acaso) -->
+        <domain includeSubdomains="true">api-agrofarm.onrender.com</domain>
+        
+        <!-- Localhost para pruebas locales -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Emulador Android -->
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+    
+</network-security-config>
