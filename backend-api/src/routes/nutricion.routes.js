@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateAuth } from "../middlewares/auth.middleware.js";
 import {
   getAlimentos,
   getAlimentoById,
@@ -14,6 +15,9 @@ import {
 } from "../controllers/nutricion.controller.js";
 
 const router = Router();
+
+// Todas las rutas de nutrición requieren autenticación
+router.use(validateAuth);
 
 // Rutas de alimentos (catálogo)
 router.get("/alimentos", getAlimentos);

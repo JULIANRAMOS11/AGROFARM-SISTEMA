@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateAuth } from "../middlewares/auth.middleware.js";
 import {
   getProduccion,
   getProduccionById,
@@ -10,6 +11,9 @@ import {
 } from "../controllers/produccion.controller.js";
 
 const router = Router();
+
+// Todas las rutas de producción requieren autenticación
+router.use(validateAuth);
 
 router.get("/", getProduccion);
 router.get("/estadisticas", getEstadisticasProduccion);

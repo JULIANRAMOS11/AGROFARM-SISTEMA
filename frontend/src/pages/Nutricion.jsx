@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
+import { apiGet, apiPost, apiDelete } from "../services/api";
 
 export default function Nutricion() {
   const [activeTab, setActiveTab] = useState("alimentos");
@@ -38,8 +37,7 @@ export default function Nutricion() {
 
   const fetchAlimentos = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/nutricion/alimentos`);
-      const data = await res.json();
+      const data = await apiGet("/nutricion/alimentos");
       setAlimentos(data);
     } catch (error) {
       console.error("Error al cargar alimentos:", error);
@@ -48,8 +46,7 @@ export default function Nutricion() {
 
   const fetchConsumos = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/nutricion/consumos`);
-      const data = await res.json();
+      const data = await apiGet("/nutricion/consumos");
       setConsumos(data);
     } catch (error) {
       console.error("Error al cargar consumos:", error);
@@ -58,8 +55,7 @@ export default function Nutricion() {
 
   const fetchPigs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pigs`);
-      const data = await res.json();
+      const data = await apiGet("/pigs");
       setPigs(data);
     } catch (error) {
       console.error("Error al cargar cerdos:", error);
@@ -69,86 +65,59 @@ export default function Nutricion() {
   const handleAlimentoSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/nutricion/alimentos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(alimentoData)
+      await apiPost("/nutricion/alimentos", alimentoData);
+      toast.success("Alimento creado exitosamente");
+      setShowAlimentoForm(false);
+      fetchAlimentos();
+      setAlimentoData({
+        nombre_alimento: "",
+        tipo: "CRECIMIENTO",
+        proteina_porcentaje: "",
+        costo_por_kg: "",
+        proveedor: "",
+        stock_kg: "",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Alimento creado exitosamente");
-        setShowAlimentoForm(false);
-        fetchAlimentos();
-        setAlimentoData({
-          nombre_alimento: "",
-          tipo: "CRECIMIENTO",
-          proteina_porcentaje: "",
-          costo_por_kg: "",
-          proveedor: "",
-          stock_kg: "",
-          observaciones: ""
-        });
-      } else {
-        toast.error(data.error || "Error al crear alimento");
-      }
     } catch (error) {
       console.error("Error al crear alimento:", error);
-      toast.error("Error de conexión");
+      toast.error(error.message || "Error de conexión");
     }
   };
 
   const handleConsumoSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/nutricion/consumos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(consumoData)
+      await apiPost("/nutricion/consumos", consumoData);
+      toast.success("Consumo registrado exitosamente");
+      setShowConsumoForm(false);
+      fetchConsumos();
+      fetchAlimentos();
+      setConsumoData({
+        pig_id: "",
+        alimento_id: "",
+        fecha: "",
+        cantidad_kg: "",
+        lote: "",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Consumo registrado exitosamente");
-        setShowConsumoForm(false);
-        fetchConsumos();
-        fetchAlimentos(); // Actualizar stock
-        setConsumoData({
-          pig_id: "",
-          alimento_id: "",
-          fecha: "",
-          cantidad_kg: "",
-          lote: "",
-          observaciones: ""
-        });
-      } else {
-        // Mostrar error detallado si existe (ej: Stock insuficiente)
-        toast.error(data.detail || data.error || "Error al registrar consumo", {
-          duration: 5000,
-          style: { border: '1px solid #EF4444', color: '#B91C1C' }
-        });
-      }
     } catch (error) {
       console.error("Error al registrar consumo:", error);
-      toast.error("Error de conexión");
+      toast.error(error.message || "Error de conexión", {
+        duration: 5000,
+        style: { border: '1px solid #EF4444', color: '#B91C1C' }
+      });
     }
   };
 
   const handleDeleteAlimento = async (id) => {
     if (window.confirm("¿Eliminar este alimento?")) {
       try {
-        const res = await fetch(`${API_BASE_URL}/nutricion/alimentos/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Alimento eliminado");
-          fetchAlimentos();
-        } else {
-          toast.error("Error al eliminar alimento");
-        }
+        await apiDelete(`/nutricion/alimentos/${id}`);
+        toast.success("Alimento eliminado");
+        fetchAlimentos();
       } catch (error) {
         console.error("Error al eliminar:", error);
-        toast.error("Error de conexión");
+        toast.error(error.message || "Error de conexión");
       }
     }
   };
@@ -177,8 +146,8 @@ export default function Nutricion() {
         <button
           onClick={() => setActiveTab("alimentos")}
           className={`pb-2 px-4 font-semibold ${activeTab === "alimentos"
-              ? "border-b-2 border-green-600 text-green-600"
-              : "text-gray-600"
+            ? "border-b-2 border-green-600 text-green-600"
+            : "text-gray-600"
             }`}
         >
           Catálogo de Alimentos
@@ -186,8 +155,8 @@ export default function Nutricion() {
         <button
           onClick={() => setActiveTab("consumos")}
           className={`pb-2 px-4 font-semibold ${activeTab === "consumos"
-              ? "border-b-2 border-green-600 text-green-600"
-              : "text-gray-600"
+            ? "border-b-2 border-green-600 text-green-600"
+            : "text-gray-600"
             }`}
         >
           Registro de Consumo

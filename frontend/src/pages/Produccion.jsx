@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
+import { apiGet, apiPost, apiDelete } from "../services/api";
 
 export default function Produccion() {
   const [registros, setRegistros] = useState([]);
@@ -28,8 +27,7 @@ export default function Produccion() {
 
   const fetchRegistros = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/produccion`);
-      const data = await res.json();
+      const data = await apiGet("/produccion");
       setRegistros(data);
     } catch (error) {
       console.error("Error al cargar registros:", error);
@@ -38,8 +36,7 @@ export default function Produccion() {
 
   const fetchPigs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pigs`);
-      const data = await res.json();
+      const data = await apiGet("/pigs");
       setPigs(data);
     } catch (error) {
       console.error("Error al cargar cerdos:", error);
@@ -48,8 +45,7 @@ export default function Produccion() {
 
   const fetchEstadisticas = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/produccion/estadisticas`);
-      const data = await res.json();
+      const data = await apiGet("/produccion/estadisticas");
       setEstadisticas(data);
     } catch (error) {
       console.error("Error al cargar estadísticas:", error);
@@ -59,54 +55,38 @@ export default function Produccion() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/produccion`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+      await apiPost("/produccion", formData);
+      toast.success("Registro de producción creado exitosamente");
+      setShowForm(false);
+      fetchRegistros();
+      fetchEstadisticas();
+      setFormData({
+        pig_id: "",
+        fecha: "",
+        peso: "",
+        edad_dias: "",
+        ganancia_diaria: "",
+        consumo_alimento_kg: "",
+        conversion_alimenticia: "",
+        lote: "",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Registro de producción creado exitosamente");
-        setShowForm(false);
-        fetchRegistros();
-        fetchEstadisticas();
-        setFormData({
-          pig_id: "",
-          fecha: "",
-          peso: "",
-          edad_dias: "",
-          ganancia_diaria: "",
-          consumo_alimento_kg: "",
-          conversion_alimenticia: "",
-          lote: "",
-          observaciones: ""
-        });
-      } else {
-        toast.error(data.error || "Error al crear registro");
-      }
     } catch (error) {
       console.error("Error al crear registro:", error);
-      toast.error("Error de conexión");
+      toast.error(error.message || "Error de conexión");
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar este registro?")) {
       try {
-        const res = await fetch(`${API_BASE_URL}/produccion/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Registro eliminado");
-          fetchRegistros();
-          fetchEstadisticas();
-        } else {
-          toast.error("Error al eliminar registro");
-        }
+        await apiDelete(`/produccion/${id}`);
+        toast.success("Registro eliminado");
+        fetchRegistros();
+        fetchEstadisticas();
       } catch (error) {
         console.error("Error al eliminar:", error);
-        toast.error("Error de conexión");
+        toast.error(error.message || "Error de conexión");
       }
     }
   };

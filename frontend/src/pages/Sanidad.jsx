@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
+import { apiGet, apiPost, apiDelete } from "../services/api";
 
 export default function Sanidad() {
   const [registros, setRegistros] = useState([]);
@@ -29,8 +28,7 @@ export default function Sanidad() {
 
   const fetchRegistros = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/sanidad`);
-      const data = await res.json();
+      const data = await apiGet("/sanidad");
       setRegistros(data);
     } catch (error) {
       console.error("Error al cargar registros:", error);
@@ -39,8 +37,7 @@ export default function Sanidad() {
 
   const fetchPigs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pigs`);
-      const data = await res.json();
+      const data = await apiGet("/pigs");
       setPigs(data);
     } catch (error) {
       console.error("Error al cargar cerdos:", error);
@@ -50,55 +47,39 @@ export default function Sanidad() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/sanidad`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+      await apiPost("/sanidad", formData);
+      toast.success("Registro sanitario creado exitosamente");
+      setShowForm(false);
+      fetchRegistros();
+      setFormData({
+        pig_id: "",
+        tipo: "VACUNA",
+        fecha: "",
+        medicamento_vacuna: "",
+        dosis: "",
+        via_administracion: "INTRAMUSCULAR",
+        veterinario: "",
+        diagnostico: "",
+        tratamiento: "",
+        costo: "",
+        proxima_aplicacion: "",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Registro sanitario creado exitosamente");
-        setShowForm(false);
-        fetchRegistros();
-        setFormData({
-          pig_id: "",
-          tipo: "VACUNA",
-          fecha: "",
-          medicamento_vacuna: "",
-          dosis: "",
-          via_administracion: "INTRAMUSCULAR",
-          veterinario: "",
-          diagnostico: "",
-          tratamiento: "",
-          costo: "",
-          proxima_aplicacion: "",
-          observaciones: ""
-        });
-      } else {
-        toast.error(data.error || "Error al crear registro");
-      }
     } catch (error) {
       console.error("Error al crear registro:", error);
-      toast.error("Error de conexión");
+      toast.error(error.message || "Error de conexión");
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar este registro?")) {
       try {
-        const res = await fetch(`${API_BASE_URL}/sanidad/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Registro eliminado");
-          fetchRegistros();
-        } else {
-          toast.error("Error al eliminar registro");
-        }
+        await apiDelete(`/sanidad/${id}`);
+        toast.success("Registro eliminado");
+        fetchRegistros();
       } catch (error) {
         console.error("Error al eliminar:", error);
-        toast.error("Error de conexión");
+        toast.error(error.message || "Error de conexión");
       }
     }
   };

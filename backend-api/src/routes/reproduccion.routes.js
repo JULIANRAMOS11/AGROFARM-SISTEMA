@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateAuth } from "../middlewares/auth.middleware.js";
 import {
   getReproduccion,
   getReproduccionById,
@@ -12,6 +13,9 @@ import {
 } from "../controllers/reproduccion.controller.js";
 
 const router = Router();
+
+// Todas las rutas de reproducción requieren autenticación
+router.use(validateAuth);
 
 // Rutas de reproducción
 router.get("/", getReproduccion);

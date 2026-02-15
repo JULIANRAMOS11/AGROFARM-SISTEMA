@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
+import { apiGet, apiPost, apiDelete } from "../services/api";
 
 export default function Reproduccion() {
   const [activeTab, setActiveTab] = useState("servicios");
@@ -38,8 +37,7 @@ export default function Reproduccion() {
 
   const fetchServicios = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/reproduccion`);
-      const data = await res.json();
+      const data = await apiGet("/reproduccion");
       setServicios(data);
     } catch (error) {
       console.error("Error al cargar servicios:", error);
@@ -48,8 +46,7 @@ export default function Reproduccion() {
 
   const fetchPartos = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/reproduccion/partos/all`);
-      const data = await res.json();
+      const data = await apiGet("/reproduccion/partos/all");
       setPartos(data);
     } catch (error) {
       console.error("Error al cargar partos:", error);
@@ -58,8 +55,7 @@ export default function Reproduccion() {
 
   const fetchPigs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pigs`);
-      const data = await res.json();
+      const data = await apiGet("/pigs");
       setPigs(data.filter(p => p.sexo === "H" || p.sexo === "Hembra"));
     } catch (error) {
       console.error("Error al cargar cerdos:", error);
@@ -69,85 +65,58 @@ export default function Reproduccion() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/reproduccion`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+      await apiPost("/reproduccion", formData);
+      toast.success("Servicio registrado exitosamente");
+      setShowForm(false);
+      fetchServicios();
+      setFormData({
+        pig_id: "",
+        tipo_servicio: "MONTA_NATURAL",
+        fecha_servicio: "",
+        verraco: "",
+        fecha_probable_parto: "",
+        estado: "GESTANTE",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Servicio registrado exitosamente");
-        setShowForm(false);
-        fetchServicios();
-        setFormData({
-          pig_id: "",
-          tipo_servicio: "MONTA_NATURAL",
-          fecha_servicio: "",
-          verraco: "",
-          fecha_probable_parto: "",
-          estado: "GESTANTE",
-          observaciones: ""
-        });
-      } else {
-        toast.error(data.error || "Error al registrar servicio");
-      }
     } catch (error) {
       console.error("Error al crear servicio:", error);
-      toast.error("Error de conexión al servidor");
+      toast.error(error.message || "Error de conexión al servidor");
     }
   };
 
   const handlePartoSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/reproduccion/partos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(partoData)
+      await apiPost("/reproduccion/partos", partoData);
+      toast.success("Parto registrado exitosamente");
+      setShowPartoForm(false);
+      fetchPartos();
+      fetchServicios();
+      setPartoData({
+        reproduccion_id: "",
+        pig_id: "",
+        fecha_parto: "",
+        lechones_nacidos_vivos: 0,
+        lechones_nacidos_muertos: 0,
+        lechones_momificados: 0,
+        peso_promedio_lechon: "",
+        observaciones: ""
       });
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Parto registrado exitosamente");
-        setShowPartoForm(false);
-        fetchPartos();
-        fetchServicios();
-        setPartoData({
-          reproduccion_id: "",
-          pig_id: "",
-          fecha_parto: "",
-          lechones_nacidos_vivos: 0,
-          lechones_nacidos_muertos: 0,
-          lechones_momificados: 0,
-          peso_promedio_lechon: "",
-          observaciones: ""
-        });
-      } else {
-        toast.error(data.error || "Error al registrar parto");
-      }
     } catch (error) {
       console.error("Error al registrar parto:", error);
-      toast.error("Error de conexión al servidor");
+      toast.error(error.message || "Error de conexión al servidor");
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar este registro?")) {
       try {
-        const res = await fetch(`${API_BASE_URL}/reproduccion/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Registro eliminado");
-          fetchServicios();
-        } else {
-          const data = await res.json();
-          toast.error(data.error || "Error al eliminar");
-        }
+        await apiDelete(`/reproduccion/${id}`);
+        toast.success("Registro eliminado");
+        fetchServicios();
       } catch (error) {
         console.error("Error al eliminar:", error);
-        toast.error("Error de conexión");
+        toast.error(error.message || "Error de conexión");
       }
     }
   };
@@ -175,8 +144,8 @@ export default function Reproduccion() {
         <button
           onClick={() => setActiveTab("servicios")}
           className={`pb-2 px-4 font-semibold ${activeTab === "servicios"
-              ? "border-b-2 border-green-600 text-green-600"
-              : "text-gray-600"
+            ? "border-b-2 border-green-600 text-green-600"
+            : "text-gray-600"
             }`}
         >
           Servicios
@@ -184,8 +153,8 @@ export default function Reproduccion() {
         <button
           onClick={() => setActiveTab("partos")}
           className={`pb-2 px-4 font-semibold ${activeTab === "partos"
-              ? "border-b-2 border-green-600 text-green-600"
-              : "text-gray-600"
+            ? "border-b-2 border-green-600 text-green-600"
+            : "text-gray-600"
             }`}
         >
           Partos

@@ -1,49 +1,29 @@
-// src/pages/Dashboard.jsx
+// src/pages/Dashboard.jsx — Layout principal con Outlet para rutas anidadas
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import PigForm from "../components/PigForm";
 import PigList from "../components/PigList";
-import Reproduccion from "./Reproduccion";
-import Sanidad from "./Sanidad";
-import Produccion from "./Produccion";
-import Nutricion from "./Nutricion";
-import Perfil from "./Perfil";
+import toast from "react-hot-toast";
+import { apiGet, apiPost, apiPatch } from "../services/api";
+import { getUser } from "../services/api";
 
 export default function Dashboard() {
   const [pigs, setPigs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeSection, setActiveSection] = useState("pigs");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Si estamos en una ruta anidada (ej: /dashboard/sanidad), renderizar Outlet
+  const isNested = location.pathname !== "/dashboard";
 
   // Cargar cerdos desde la API
   const loadPigs = async () => {
     try {
       setLoading(true);
       setError("");
-
-      const token = localStorage.getItem("token");
-      const res = await fetch("https://api-agrofarm.onrender.com/api/pigs", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          navigate("/login");
-          return;
-        }
-        throw new Error("Error al cargar los cerdos");
-      }
-
-      const data = await res.json();
+      const data = await apiGet("/pigs");
       setPigs(data);
     } catch (err) {
       setError(err.message || "Error al conectar con la API");
@@ -54,101 +34,63 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadPigs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Agrega un nuevo cerdo a la lista
+  // Agrega un nuevo cerdo
   const handleAddPig = async (nuevoCerdo) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("https://api-agrofarm.onrender.com/api/pigs", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(nuevoCerdo),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al crear el cerdo");
-      }
-
-      // Recargar la lista
+      await apiPost("/pigs", nuevoCerdo);
+      toast.success("Cerdo registrado exitosamente");
       await loadPigs();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "Error al crear el cerdo");
     }
   };
 
   // Cambia el estado del cerdo
   const handleToggleStatus = async (id, currentStatus) => {
     try {
-      const token = localStorage.getItem("token");
       const newStatus = currentStatus === "ACTIVO" ? "INACTIVO" : "ACTIVO";
-      
-      const res = await fetch(`https://api-agrofarm.onrender.com/api/pigs/${id}/status`, {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ estado: newStatus }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al actualizar el estado");
-      }
-
-      // Recargar la lista
+      await apiPatch(`/pigs/${id}/status`, { estado: newStatus });
+      toast.success(`Estado actualizado a ${newStatus}`);
       await loadPigs();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "Error al actualizar el estado");
     }
   };
 
   const getSectionTitle = () => {
+    const path = location.pathname.split("/").pop();
     const titles = {
       dashboard: "Resumen General",
-      pigs: "Gestión de Cerdos",
-      reproduction: "Reproducción",
-      health: "Sanidad",
-      production: "Producción",
-      nutrition: "Nutrición",
-      profile: "Perfil de Usuario"
+      cerdos: "Gestión de Cerdos",
+      reproduccion: "Reproducción",
+      sanidad: "Sanidad",
+      produccion: "Producción",
+      nutricion: "Nutrición",
+      perfil: "Perfil de Usuario"
     };
-    return titles[activeSection] || "Dashboard";
+    return titles[path] || "Dashboard";
   };
 
-  const userString = localStorage.getItem("user");
-  let userName = "Usuario";
-  try {
-    const user = userString ? JSON.parse(userString) : null;
-    userName = user?.username || user?.email || "Usuario";
-  } catch (e) {
-    // ignore
-  }
+  const userData = getUser();
+  const userName = userData?.username || "Usuario";
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       {/* Sidebar */}
-      <Sidebar 
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
+      <Sidebar
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Contenido Principal */}
       <div className="flex-1 flex flex-col min-h-screen">
-        
+
         {/* Header */}
         <header className="sticky top-0 z-10 h-20 bg-white/80 backdrop-blur-md border-b border-white/40 shadow-xl shadow-green-900/10 flex justify-between items-center px-6 md:px-10">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden text-green-800 hover:text-green-600"
             >
@@ -172,16 +114,46 @@ export default function Dashboard() {
 
         {/* Contenido por Sección */}
         <main className="flex-1 p-6 md:p-10">
-          
-          {activeSection === "pigs" && (
+
+          {isNested ? (
+            // Renderizar la ruta anidada (Sanidad, Produccion, etc.)
+            <Outlet />
+          ) : (
+            // Dashboard principal: mostrar gestión de cerdos + resumen
             <div className="space-y-6">
-              {/* Tarjeta de Registro */}
+              {/* Estadísticas */}
+              <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Estadísticas Generales</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
+                    <i className="fas fa-paw text-3xl mb-3"></i>
+                    <p className="text-sm opacity-90">Total Cerdos</p>
+                    <p className="text-4xl font-bold">{pigs.length}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+                    <i className="fas fa-check-circle text-3xl mb-3"></i>
+                    <p className="text-sm opacity-90">Activos</p>
+                    <p className="text-4xl font-bold">{pigs.filter(p => p.estado === "ACTIVO").length}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+                    <i className="fas fa-weight text-3xl mb-3"></i>
+                    <p className="text-sm opacity-90">Peso Promedio</p>
+                    <p className="text-4xl font-bold">
+                      {pigs.length > 0
+                        ? (pigs.reduce((sum, p) => sum + (parseFloat(p.peso_actual) || 0), 0) / pigs.length).toFixed(1)
+                        : 0} kg
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Registro de cerdos */}
               <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Registrar Nuevo Cerdo</h3>
                 <PigForm onAddPig={handleAddPig} />
               </div>
 
-              {/* Tarjeta de Listado */}
+              {/* Listado de cerdos */}
               <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Listado de Cerdos</h3>
                 {loading && <p className="text-gray-600">Cargando...</p>}
@@ -193,43 +165,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {activeSection === "dashboard" && (
-            <div className="bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Estadísticas Generales</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
-                  <i className="fas fa-paw text-3xl mb-3"></i>
-                  <p className="text-sm opacity-90">Total Cerdos</p>
-                  <p className="text-4xl font-bold">{pigs.length}</p>
-                </div>
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-                  <i className="fas fa-check-circle text-3xl mb-3"></i>
-                  <p className="text-sm opacity-90">Activos</p>
-                  <p className="text-4xl font-bold">{pigs.filter(p => p.estado === "ACTIVO").length}</p>
-                </div>
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-                  <i className="fas fa-weight text-3xl mb-3"></i>
-                  <p className="text-sm opacity-90">Peso Promedio</p>
-                  <p className="text-4xl font-bold">
-                    {pigs.length > 0 
-                      ? (pigs.reduce((sum, p) => sum + (parseFloat(p.peso_actual) || 0), 0) / pigs.length).toFixed(1)
-                      : 0} kg
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {["reproduction", "health", "production", "nutrition", "profile"].includes(activeSection) && (
-            <div>
-              {activeSection === "reproduction" && <Reproduccion />}
-              {activeSection === "health" && <Sanidad />}
-              {activeSection === "production" && <Produccion />}
-              {activeSection === "nutrition" && <Nutricion />}
-              {activeSection === "profile" && <Perfil />}
-            </div>
-          )}
-          
         </main>
       </div>
     </div>

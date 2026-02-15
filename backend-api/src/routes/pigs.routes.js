@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateAuth } from "../middlewares/auth.middleware.js";
 import {
   getAllPigs,
   getPigById,
@@ -9,6 +10,9 @@ import {
 } from "../controllers/pigs.controller.js";
 
 const router = Router();
+
+// Todas las rutas de cerdos requieren autenticación
+router.use(validateAuth);
 
 router.get("/", getAllPigs);
 router.get("/:id", getPigById);

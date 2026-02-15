@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validateAuth } from "../middlewares/auth.middleware.js";
 import {
   getSanidad,
   getSanidadById,
@@ -10,6 +11,9 @@ import {
 } from "../controllers/sanidad.controller.js";
 
 const router = Router();
+
+// Todas las rutas de sanidad requieren autenticación
+router.use(validateAuth);
 
 router.get("/", getSanidad);
 router.get("/proximas", getProximasAplicaciones);

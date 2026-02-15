@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { login as apiLogin } from "../services/api";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -19,30 +20,10 @@ export default function Login() {
 
     try {
       setLoading(true);
-
-      const res = await fetch("https://api-agrofarm.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          username: username.trim(),
-          password: password.trim(),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data?.error || "Error al iniciar sesión.");
-        return;
-      }
-
-      localStorage.setItem("token", "api-login-ok");
-      localStorage.setItem("user", JSON.stringify(data.usuario));
-
+      await apiLogin({ username: username.trim(), password: password.trim() });
       nav("/dashboard");
     } catch (e2) {
-      setError("No se pudo conectar con la API.");
+      setError(e2.message || "No se pudo conectar con la API.");
     } finally {
       setLoading(false);
     }
@@ -54,33 +35,33 @@ export default function Login() {
     <div className="min-h-screen flex bg-white overflow-x-hidden">
       {/* Sección Izquierda - Decorativa */}
       <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-green-900 relative items-center justify-center overflow-hidden">
-        <img 
-          src="/cerdos.webp" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40" 
+        <img
+          src="/cerdos.webp"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
           alt="Granja Fondo"
         />
-        
+
         <div className="relative z-10 text-center px-10">
           <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Gestión Inteligente <br /> para tu Granja.
+            Gestión Inteligente <br />para tu Granja.
           </h2>
           <p className="text-green-100 text-lg max-w-md mx-auto leading-relaxed">
             Controla la producción, sanidad y reproducción de tu ganado porcino en un solo lugar.
           </p>
         </div>
-        
+
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-green-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
       </div>
 
       {/* Sección Derecha - Formulario */}
       <div className="w-full md:w-1/2 lg:w-2/5 flex flex-col justify-center items-center p-8 lg:p-16 relative overflow-y-auto">
         <div className="w-full max-w-md">
-          
+
           {/* Header */}
           <div className="text-center mb-10">
-            <img 
-              src="/logo2.png" 
-              alt="Logo Agrofarm" 
+            <img
+              src="/logo2.png"
+              alt="Logo Agrofarm"
               className="mx-auto h-36 md:h-44 w-auto max-w-full object-contain mb-6 drop-shadow-xl"
             />
             <h1 className="text-3xl font-bold text-gray-900">Bienvenido</h1>
@@ -93,7 +74,7 @@ export default function Login() {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Ingresa con tu correo</span>
+              <span className="px-2 bg-white text-gray-500">Ingresa con tu usuario</span>
             </div>
           </div>
 
@@ -128,8 +109,8 @@ export default function Login() {
               </div>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={disabled}
               className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
             >

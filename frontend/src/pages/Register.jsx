@@ -1,6 +1,7 @@
 // src/pages/Register.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { register as apiRegister } from "../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,28 +25,13 @@ export default function Register() {
 
     try {
       setLoading(true);
-
-      const res = await fetch("https://api-agrofarm.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data?.error || "No se pudo registrar el usuario.");
-        return;
-      }
-
-      setMsg("Usuario registrado correctamente. Ahora puedes iniciar sesión.");
+      await apiRegister({ username, password });
+      setMsg("Usuario registrado correctamente. Redirigiendo...");
       setUsername("");
       setPassword("");
-
-      setTimeout(() => navigate("/login"), 900);
+      setTimeout(() => navigate("/dashboard"), 900);
     } catch (err) {
-      setError("Error de conexión con la API.");
+      setError(err.message || "Error de conexión con la API.");
     } finally {
       setLoading(false);
     }
@@ -55,12 +41,12 @@ export default function Register() {
     <div className="min-h-screen flex bg-white">
       {/* Sección Izquierda - Decorativa */}
       <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-green-900 relative items-center justify-center overflow-hidden">
-        <img 
-          src="/cerdos.webp" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40" 
+        <img
+          src="/cerdos.webp"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
           alt="Granja Fondo"
         />
-        
+
         <div className="relative z-10 text-center px-10">
           <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight">
             Únete a AGROFARM
@@ -74,11 +60,11 @@ export default function Register() {
       {/* Sección Derecha - Formulario */}
       <div className="w-full md:w-1/2 lg:w-2/5 flex flex-col justify-center items-center p-8 lg:p-16">
         <div className="w-full max-w-md">
-          
+
           <div className="text-center mb-10">
-            <img 
-              src="/logo2.png" 
-              alt="Logo Agrofarm" 
+            <img
+              src="/logo2.png"
+              alt="Logo Agrofarm"
               className="mx-auto h-36 md:h-44 w-auto max-w-full object-contain mb-6 drop-shadow-xl"
             />
             <h1 className="text-3xl font-bold text-gray-900">Crear Cuenta</h1>
@@ -112,15 +98,15 @@ export default function Register() {
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
-            
+
             {msg && (
               <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-600">{msg}</p>
               </div>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
             >

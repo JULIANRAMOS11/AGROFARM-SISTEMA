@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://api-agrofarm.onrender.com/api";
+import toast from "react-hot-toast";
+import { apiGet, apiPut, apiPost } from "../services/api";
+import { getUser } from "../services/api";
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
@@ -20,24 +21,15 @@ export default function Perfil() {
   });
 
   useEffect(() => {
-    const userString = localStorage.getItem("user");
-    if (userString) {
-      try {
-        const userData = JSON.parse(userString);
-        const username = userData.username;
-        if (username) {
-          fetchPerfil(username);
-        }
-      } catch (error) {
-        console.error("Error al parsear usuario:", error);
-      }
+    const userData = getUser();
+    if (userData?.username) {
+      fetchPerfil(userData.username);
     }
   }, []);
 
   const fetchPerfil = async (username) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/perfil?username=${username}`);
-      const data = await res.json();
+      const data = await apiGet(`/perfil?username=${username}`);
       setUser(data);
       setFormData({
         nombre_completo: data.nombre_completo || "",
@@ -54,56 +46,39 @@ export default function Perfil() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/perfil/${user.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-      if (res.ok) {
-        const updatedUser = await res.json();
-        setUser(updatedUser);
-        setIsEditing(false);
-        alert("Perfil actualizado exitosamente");
-      }
+      const updatedUser = await apiPut(`/perfil/${user.id}`, formData);
+      setUser(updatedUser);
+      setIsEditing(false);
+      toast.success("Perfil actualizado exitosamente");
     } catch (error) {
       console.error("Error al actualizar perfil:", error);
-      alert("Error al actualizar perfil");
+      toast.error(error.message || "Error al actualizar perfil");
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.password_nueva !== passwordData.password_confirmar) {
-      alert("Las contraseñas no coinciden");
+      toast.error("Las contraseñas no coinciden");
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/perfil/${user.id}/password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          password_actual: passwordData.password_actual,
-          password_nueva: passwordData.password_nueva
-        })
+      await apiPost(`/perfil/${user.id}/password`, {
+        password_actual: passwordData.password_actual,
+        password_nueva: passwordData.password_nueva
       });
-      
-      if (res.ok) {
-        alert("Contraseña actualizada exitosamente");
-        setShowPasswordForm(false);
-        setPasswordData({
-          password_actual: "",
-          password_nueva: "",
-          password_confirmar: ""
-        });
-      } else {
-        const error = await res.json();
-        alert(error.error || "Error al cambiar contraseña");
-      }
+      toast.success("Contraseña actualizada exitosamente");
+      setShowPasswordForm(false);
+      setPasswordData({
+        password_actual: "",
+        password_nueva: "",
+        password_confirmar: ""
+      });
     } catch (error) {
       console.error("Error al cambiar contraseña:", error);
-      alert("Error al cambiar contraseña");
+      toast.error(error.message || "Error al cambiar contraseña");
     }
   };
 
