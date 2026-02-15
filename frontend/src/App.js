@@ -36,7 +36,12 @@ export default function App() {
           <Route path="produccion" element={<Produccion />} />
           <Route path="nutricion" element={<Nutricion />} />
           <Route path="perfil" element={<Perfil />} />
+          {/* Catch-all — prevents blank screen on unknown paths */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
+
+        {/* Global catch-all */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

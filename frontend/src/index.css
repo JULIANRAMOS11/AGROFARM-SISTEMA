@@ -1,3 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -24,9 +30,7 @@ html {
   min-height: 100vh;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SCROLLBAR PERSONALIZADA
-   ═══════════════════════════════════════════════════════════ */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -45,15 +49,14 @@ html {
   background: #4ade80;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   ANIMACIONES PERSONALIZADAS - AGROFARM
-   ═══════════════════════════════════════════════════════════ */
-
-/* Animación de flotación suave para decoraciones */
+/* Custom animations */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-15px);
   }
@@ -63,19 +66,11 @@ html {
   animation: float 5s ease-in-out infinite;
 }
 
-.animate-float.delay-300 {
-  animation-delay: 1.5s;
-}
-
-.animate-float.delay-500 {
-  animation-delay: 2.5s;
-}
-
-/* Fade in suave */
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -85,12 +80,12 @@ html {
   animation: fadeIn 0.7s ease-out;
 }
 
-/* Slide up desde abajo */
 @keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(25px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -101,12 +96,12 @@ html {
   animation: slideUp 0.5s ease-out;
 }
 
-/* Scale in (aparición con zoom) */
 @keyframes scaleIn {
   from {
     opacity: 0;
     transform: scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

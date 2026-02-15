@@ -28,9 +28,7 @@ export default function Register() {
 
         <div className="relative z-10 flex flex-col justify-center px-16">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shadow-xl">
-              <i className="fas fa-leaf text-white text-2xl"></i>
-            </div>
+            <img src="/logo2.png" alt="AGROFARM" className="w-16 h-16 rounded-2xl shadow-xl" />
             <div>
               <h1 className="text-3xl font-extrabold text-white tracking-tight">AGROFARM</h1>
               <p className="text-emerald-200 text-sm font-medium">Sistema de Gestión Porcina</p>
@@ -61,9 +59,7 @@ export default function Register() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <i className="fas fa-leaf text-white text-xl"></i>
-            </div>
+            <img src="/logo2.png" alt="AGROFARM" className="w-12 h-12 rounded-2xl shadow-lg" />
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">AGROFARM</h1>
               <p className="text-xs text-gray-400 font-medium">Gestión Porcina</p>

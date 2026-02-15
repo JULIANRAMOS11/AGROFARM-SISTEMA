@@ -1,4 +1,4 @@
-// src/components/Sidebar.jsx — Menú lateral premium
+// src/components/Sidebar.jsx — Menú lateral premium con logo original
 import { NavLink, useNavigate } from "react-router-dom";
 import { clearAuth } from "../services/api";
 
@@ -20,17 +20,15 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }) {
 
   const NavContent = () => (
     <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-6 py-6 border-b border-slate-700/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <i className="fas fa-leaf text-white text-lg"></i>
-          </div>
+      {/* Logo original AGROFARM */}
+      <div className="px-5 py-5 border-b border-slate-700/50">
+        <NavLink to="/dashboard" className="flex items-center gap-3">
+          <img src="/logo2.png" alt="AGROFARM" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
           <div>
             <h1 className="text-lg font-extrabold text-white tracking-tight">AGROFARM</h1>
             <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Gestión Porcina</p>
           </div>
-        </div>
+        </NavLink>
       </div>
 
       {/* Navigation */}
@@ -55,7 +53,7 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }) {
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-all duration-200
                   ${isActive
                     ? "bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30"
-                    : "bg-slate-800 text-slate-400 group-hover:text-slate-300"
+                    : "bg-slate-800 text-slate-400"
                   }`}>
                   <i className={`fas ${link.icon}`}></i>
                 </div>
@@ -112,7 +110,7 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-[260px] bg-slate-900 border-r border-slate-800 min-h-screen">
+      <aside className="hidden md:flex md:flex-col md:w-[260px] bg-slate-900 border-r border-slate-800 min-h-screen flex-shrink-0">
         <NavContent />
       </aside>
 
