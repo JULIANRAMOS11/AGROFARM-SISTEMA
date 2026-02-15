@@ -117,7 +117,7 @@ export const deleteAlimento = async (req, res) => {
 export const getConsumos = async (req, res) => {
   try {
     const { rows } = await pool.query(`
-      SELECT c.*, p.codigo_arete, a.nombre_alimento, a.tipo as tipo_alimento
+      SELECT c.*, p.codigo_arete, p.nombre as nombre_cerdo, a.nombre_alimento, a.tipo as tipo_alimento
       FROM consumo_alimento c
       LEFT JOIN pigs p ON c.pig_id = p.id
       LEFT JOIN alimentacion a ON c.alimento_id = a.id

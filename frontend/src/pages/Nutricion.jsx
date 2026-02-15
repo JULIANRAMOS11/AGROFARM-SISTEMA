@@ -242,7 +242,12 @@ export default function Nutricion() {
                 <tbody className="divide-y divide-gray-100">
                   {consumos.map(c => (
                     <tr key={c.id} className="hover:bg-green-50/50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-800">{c.codigo_arete}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-800">{c.nombre_cerdo || c.codigo_arete}</span>
+                          {c.nombre_cerdo && <span className="text-xs text-gray-400">Arete: {c.codigo_arete}</span>}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{c.nombre_alimento}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(c.fecha).toLocaleDateString()}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-emerald-600">{parseFloat(c.cantidad_kg).toFixed(2)} kg</td>
