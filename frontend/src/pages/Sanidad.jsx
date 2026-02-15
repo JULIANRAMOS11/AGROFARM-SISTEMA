@@ -7,189 +7,147 @@ export default function Sanidad() {
   const [pigs, setPigs] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    pig_id: "",
-    tipo: "VACUNA",
-    fecha: "",
-    medicamento_vacuna: "",
-    dosis: "",
-    via_administracion: "INTRAMUSCULAR",
-    veterinario: "",
-    diagnostico: "",
-    tratamiento: "",
-    costo: "",
-    proxima_aplicacion: "",
-    observaciones: ""
+    pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "",
+    dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "",
+    diagnostico: "", tratamiento: "", costo: "", proxima_aplicacion: "", observaciones: ""
   });
 
-  useEffect(() => {
-    fetchRegistros();
-    fetchPigs();
-  }, []);
+  useEffect(() => { fetchRegistros(); fetchPigs(); }, []);
 
   const fetchRegistros = async () => {
-    try {
-      const data = await apiGet("/sanidad");
-      setRegistros(data);
-    } catch (error) {
-      console.error("Error al cargar registros:", error);
-    }
+    try { const data = await apiGet("/sanidad"); setRegistros(data); }
+    catch (err) { console.error(err); }
   };
-
   const fetchPigs = async () => {
-    try {
-      const data = await apiGet("/pigs");
-      setPigs(data);
-    } catch (error) {
-      console.error("Error al cargar cerdos:", error);
-    }
+    try { const data = await apiGet("/pigs"); setPigs(data); }
+    catch (err) { console.error(err); }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await apiPost("/sanidad", formData);
-      toast.success("Registro sanitario creado exitosamente");
-      setShowForm(false);
-      fetchRegistros();
-      setFormData({
-        pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "",
-        dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "",
-        diagnostico: "", tratamiento: "", costo: "", proxima_aplicacion: "",
-        observaciones: ""
-      });
-    } catch (error) {
-      console.error("Error al crear registro:", error);
-      toast.error(error.message || "Error de conexión");
-    }
+      toast.success("Registro sanitario creado");
+      setShowForm(false); fetchRegistros();
+      setFormData({ pig_id: "", tipo: "VACUNA", fecha: "", medicamento_vacuna: "", dosis: "", via_administracion: "INTRAMUSCULAR", veterinario: "", diagnostico: "", tratamiento: "", costo: "", proxima_aplicacion: "", observaciones: "" });
+    } catch (err) { toast.error(err.message || "Error"); }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("¿Eliminar este registro?")) {
-      try {
-        await apiDelete(`/sanidad/${id}`);
-        toast.success("Registro eliminado");
-        fetchRegistros();
-      } catch (error) {
-        console.error("Error al eliminar:", error);
-        toast.error(error.message || "Error de conexión");
-      }
-    }
+    if (!window.confirm("¿Eliminar este registro?")) return;
+    try { await apiDelete(`/sanidad/${id}`); toast.success("Eliminado"); fetchRegistros(); }
+    catch (err) { toast.error(err.message || "Error"); }
   };
 
   const getTipoBadge = (tipo) => {
-    const styles = {
-      VACUNA: "bg-blue-50 text-blue-700 border-blue-100",
-      TRATAMIENTO: "bg-purple-50 text-purple-700 border-purple-100",
-      DESPARASITACION: "bg-emerald-50 text-emerald-700 border-emerald-100",
-      DIAGNOSTICO: "bg-amber-50 text-amber-700 border-amber-100"
+    const map = {
+      VACUNA: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", icon: "fa-syringe" },
+      TRATAMIENTO: { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200", icon: "fa-pills" },
+      DESPARASITACION: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", icon: "fa-shield-virus" },
+      DIAGNOSTICO: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", icon: "fa-stethoscope" }
     };
-    return styles[tipo] || "bg-gray-50 text-gray-700 border-gray-100";
+    const s = map[tipo] || { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200", icon: "fa-tag" };
+    return (
+      <span className={`badge ${s.bg} ${s.text} border ${s.border}`}>
+        <i className={`fas ${s.icon} mr-1 text-[10px]`}></i>{tipo}
+      </span>
+    );
   };
 
   return (
-    <div className="space-y-5 animate-fadeIn">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div>
+      {/* ── Page Header ── */}
+      <div className="page-header">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <i className="fas fa-heart-pulse text-green-500"></i>Sanidad
-          </h2>
-          <p className="text-sm text-gray-400 mt-0.5">{registros.length} registros</p>
+          <h2><i className="fas fa-heart-pulse"></i>Sanidad</h2>
+          <p className="subtitle">Gestión de registros sanitarios · {registros.length} registros</p>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+          <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>
           {showForm ? "Cerrar" : "Nuevo Registro"}
         </button>
       </div>
 
-      {/* Formulario */}
+      {/* ── Formulario ── */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="glass-card p-6 animate-scaleIn">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <i className="fas fa-file-medical text-green-500"></i>Nuevo Registro Sanitario
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label className="form-label">Cerdo <span className="required">*</span></label>
-              <select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className="input-modern" required>
-                <option value="">Seleccione...</option>
-                {pigs.map((pig) => (
-                  <option key={pig.id} value={pig.id}>{pig.codigo_arete} - {pig.sexo}</option>
-                ))}
-              </select>
+        <div className="form-card anim-scaleIn">
+          <h3><i className="fas fa-file-medical"></i>Nuevo Registro Sanitario</h3>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="form-label">Cerdo <span className="required">*</span></label>
+                <select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className="input-modern" required>
+                  <option value="">Seleccione un cerdo...</option>
+                  {pigs.map(p => <option key={p.id} value={p.id}>{p.codigo_arete} — {p.raza} ({p.sexo})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="form-label">Tipo <span className="required">*</span></label>
+                <select value={formData.tipo} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} className="input-modern" required>
+                  <option value="VACUNA">🩺 Vacuna</option>
+                  <option value="TRATAMIENTO">💊 Tratamiento</option>
+                  <option value="DESPARASITACION">🛡 Desparasitación</option>
+                  <option value="DIAGNOSTICO">🔬 Diagnóstico</option>
+                </select>
+              </div>
+              <div>
+                <label className="form-label">Fecha <span className="required">*</span></label>
+                <input type="date" value={formData.fecha} onChange={(e) => setFormData({ ...formData, fecha: e.target.value })} className="input-modern" required />
+              </div>
+              <div>
+                <label className="form-label">Medicamento / Vacuna</label>
+                <input type="text" value={formData.medicamento_vacuna} onChange={(e) => setFormData({ ...formData, medicamento_vacuna: e.target.value })} className="input-modern" placeholder="Nombre del medicamento" />
+              </div>
+              <div>
+                <label className="form-label">Dosis</label>
+                <input type="text" value={formData.dosis} onChange={(e) => setFormData({ ...formData, dosis: e.target.value })} className="input-modern" placeholder="Ej: 5ml" />
+              </div>
+              <div>
+                <label className="form-label">Vía de Administración</label>
+                <select value={formData.via_administracion} onChange={(e) => setFormData({ ...formData, via_administracion: e.target.value })} className="input-modern">
+                  <option value="INTRAMUSCULAR">Intramuscular</option>
+                  <option value="SUBCUTANEA">Subcutánea</option>
+                  <option value="ORAL">Oral</option>
+                  <option value="TOPICA">Tópica</option>
+                  <option value="INTRAVENOSA">Intravenosa</option>
+                </select>
+              </div>
+              <div>
+                <label className="form-label">Veterinario</label>
+                <input type="text" value={formData.veterinario} onChange={(e) => setFormData({ ...formData, veterinario: e.target.value })} className="input-modern" placeholder="Nombre del veterinario" />
+              </div>
+              <div>
+                <label className="form-label">Costo ($)</label>
+                <input type="number" step="0.01" min="0" value={formData.costo} onChange={(e) => setFormData({ ...formData, costo: e.target.value })} className="input-modern" placeholder="0.00" />
+              </div>
+              <div>
+                <label className="form-label">Próxima Aplicación</label>
+                <input type="date" value={formData.proxima_aplicacion} onChange={(e) => setFormData({ ...formData, proxima_aplicacion: e.target.value })} className="input-modern" />
+              </div>
+              <div className="md:col-span-2 lg:col-span-3">
+                <label className="form-label">Diagnóstico</label>
+                <input type="text" value={formData.diagnostico} onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })} className="input-modern" placeholder="Describe el diagnóstico" />
+              </div>
+              <div className="md:col-span-2 lg:col-span-3">
+                <label className="form-label">Observaciones</label>
+                <textarea value={formData.observaciones} onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })} className="input-modern" rows="2" placeholder="Notas adicionales..." />
+              </div>
             </div>
-            <div>
-              <label className="form-label">Tipo <span className="required">*</span></label>
-              <select value={formData.tipo} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} className="input-modern" required>
-                <option value="VACUNA">Vacuna</option>
-                <option value="TRATAMIENTO">Tratamiento</option>
-                <option value="DESPARASITACION">Desparasitación</option>
-                <option value="DIAGNOSTICO">Diagnóstico</option>
-              </select>
+            <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
+              <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar Registro</button>
+              <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">Cancelar</button>
             </div>
-            <div>
-              <label className="form-label">Fecha <span className="required">*</span></label>
-              <input type="date" value={formData.fecha} onChange={(e) => setFormData({ ...formData, fecha: e.target.value })} className="input-modern" required />
-            </div>
-            <div>
-              <label className="form-label">Medicamento/Vacuna <span className="required">*</span></label>
-              <input type="text" value={formData.medicamento_vacuna} onChange={(e) => setFormData({ ...formData, medicamento_vacuna: e.target.value })} className="input-modern" required placeholder="Nombre del medicamento" />
-            </div>
-            <div>
-              <label className="form-label">Dosis</label>
-              <input type="text" value={formData.dosis} onChange={(e) => setFormData({ ...formData, dosis: e.target.value })} className="input-modern" placeholder="ej: 2ml, 500mg" />
-            </div>
-            <div>
-              <label className="form-label">Vía de Administración</label>
-              <select value={formData.via_administracion} onChange={(e) => setFormData({ ...formData, via_administracion: e.target.value })} className="input-modern">
-                <option value="ORAL">Oral</option>
-                <option value="INTRAMUSCULAR">Intramuscular</option>
-                <option value="SUBCUTANEA">Subcutánea</option>
-                <option value="TOPICA">Tópica</option>
-              </select>
-            </div>
-            <div>
-              <label className="form-label">Veterinario</label>
-              <input type="text" value={formData.veterinario} onChange={(e) => setFormData({ ...formData, veterinario: e.target.value })} className="input-modern" placeholder="Nombre del veterinario" />
-            </div>
-            <div>
-              <label className="form-label">Costo</label>
-              <input type="number" step="0.01" value={formData.costo} onChange={(e) => setFormData({ ...formData, costo: e.target.value })} className="input-modern" placeholder="0.00" min="0" />
-            </div>
-            <div>
-              <label className="form-label">Próxima Aplicación</label>
-              <input type="date" value={formData.proxima_aplicacion} onChange={(e) => setFormData({ ...formData, proxima_aplicacion: e.target.value })} className="input-modern" />
-            </div>
-            <div>
-              <label className="form-label">Diagnóstico</label>
-              <input type="text" value={formData.diagnostico} onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })} className="input-modern" />
-            </div>
-            <div className="md:col-span-2 lg:col-span-3">
-              <label className="form-label">Tratamiento</label>
-              <textarea value={formData.tratamiento} onChange={(e) => setFormData({ ...formData, tratamiento: e.target.value })} className="input-modern" rows="2" />
-            </div>
-            <div className="md:col-span-2 lg:col-span-3">
-              <label className="form-label">Observaciones</label>
-              <textarea value={formData.observaciones} onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })} className="input-modern" rows="2" />
-            </div>
-          </div>
-          <div className="flex gap-2 mt-5">
-            <button type="submit" className="btn-primary">
-              <i className="fas fa-save"></i>Guardar
-            </button>
-            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">
-              Cancelar
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       )}
 
-      {/* Tabla */}
-      <div className="glass-card overflow-hidden">
+      {/* ── Tabla ── */}
+      <div className="table-container">
         {registros.length === 0 ? (
           <div className="empty-state">
-            <i className="fas fa-heart-pulse"></i>
-            <p>No hay registros sanitarios todavía.</p>
+            <div className="empty-icon"><i className="fas fa-heart-pulse"></i></div>
+            <p>No hay registros sanitarios</p>
+            <p className="empty-sub">Agrega un nuevo registro para empezar</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -202,26 +160,24 @@ export default function Sanidad() {
                   <th>Medicamento</th>
                   <th>Dosis</th>
                   <th>Veterinario</th>
-                  <th>Próxima</th>
+                  <th>Costo</th>
                   <th className="text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {registros.map((registro) => (
-                  <tr key={registro.id}>
-                    <td className="font-semibold text-gray-900">{registro.codigo_arete}</td>
+                {registros.map(r => (
+                  <tr key={r.id}>
                     <td>
-                      <span className={`badge border ${getTipoBadge(registro.tipo)}`}>
-                        {registro.tipo}
-                      </span>
+                      <span className="font-semibold text-gray-900">{r.codigo_arete}</span>
                     </td>
-                    <td>{new Date(registro.fecha).toLocaleDateString()}</td>
-                    <td>{registro.medicamento_vacuna}</td>
-                    <td>{registro.dosis || "—"}</td>
-                    <td>{registro.veterinario || "—"}</td>
-                    <td>{registro.proxima_aplicacion ? new Date(registro.proxima_aplicacion).toLocaleDateString() : "—"}</td>
+                    <td>{getTipoBadge(r.tipo)}</td>
+                    <td>{new Date(r.fecha).toLocaleDateString()}</td>
+                    <td>{r.medicamento_vacuna || <span className="text-gray-300">—</span>}</td>
+                    <td>{r.dosis || <span className="text-gray-300">—</span>}</td>
+                    <td>{r.veterinario || <span className="text-gray-300">—</span>}</td>
+                    <td>{r.costo ? <span className="font-semibold text-emerald-600">${parseFloat(r.costo).toFixed(2)}</span> : <span className="text-gray-300">—</span>}</td>
                     <td className="text-center">
-                      <button onClick={() => handleDelete(registro.id)} className="btn-danger">
+                      <button onClick={() => handleDelete(r.id)} className="btn-danger" title="Eliminar">
                         <i className="fas fa-trash text-xs"></i>
                       </button>
                     </td>
