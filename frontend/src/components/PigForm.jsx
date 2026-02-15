@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 export default function PigForm({ onAddPig, initialData }) {
   const [formData, setFormData] = useState({
-    codigo_arete: "", nombre: "", raza: "", sexo: "M",
+    codigo_arete: "", nombre: "", raza: "", sexo: "Macho",
     fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO",
     ubicacion: "", observaciones: ""
   });
@@ -14,7 +14,7 @@ export default function PigForm({ onAddPig, initialData }) {
         codigo_arete: initialData.codigo_arete || "",
         nombre: initialData.nombre || "",
         raza: initialData.raza || "",
-        sexo: initialData.sexo || "M",
+        sexo: initialData.sexo || "Macho",
         fecha_nacimiento: initialData.fecha_nacimiento || "",
         peso_actual: initialData.peso_actual || "",
         estado: initialData.estado || "ACTIVO",
@@ -28,7 +28,7 @@ export default function PigForm({ onAddPig, initialData }) {
     e.preventDefault();
     onAddPig(formData);
     if (!initialData) {
-      setFormData({ codigo_arete: "", nombre: "", raza: "", sexo: "M", fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO", ubicacion: "", observaciones: "" });
+      setFormData({ codigo_arete: "", nombre: "", raza: "", sexo: "Macho", fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO", ubicacion: "", observaciones: "" });
     }
   };
 
@@ -64,8 +64,9 @@ export default function PigForm({ onAddPig, initialData }) {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">Sexo <span className="text-red-500">*</span></label>
           <select value={formData.sexo} onChange={(e) => setFormData({ ...formData, sexo: e.target.value })} className={inputClass} required>
-            <option value="M">Macho</option>
-            <option value="H">Hembra</option>
+            <option value="">Seleccione sexo...</option>
+            <option value="Macho">🐗 Macho</option>
+            <option value="Hembra">🐷 Hembra</option>
           </select>
         </div>
         <div>
