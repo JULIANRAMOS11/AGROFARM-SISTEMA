@@ -62,7 +62,17 @@ export default function PigForm({ onAddPig, initialData }) {
         </div>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">Ubicación</label>
-          <input type="text" value={formData.ubicacion} onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })} className={inputClass} placeholder="Corral, galpón..." />
+          <select value={formData.ubicacion} onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })} className={inputClass}>
+            <option value="">Seleccione ubicación...</option>
+            <option value="Corral 1">Corral 1</option>
+            <option value="Corral 2">Corral 2</option>
+            <option value="Corral 3">Corral 3</option>
+            <option value="Galpón A">Galpón A</option>
+            <option value="Galpón B">Galpón B</option>
+            <option value="Maternidad">Maternidad</option>
+            <option value="Engorde">Engorde</option>
+            <option value="Cuarentena">Cuarentena</option>
+          </select>
         </div>
         <div className="lg:col-span-2">
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">Observaciones</label>

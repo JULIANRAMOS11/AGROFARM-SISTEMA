@@ -6,13 +6,14 @@ import toast from "react-hot-toast";
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("USER");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try { await register({ username, password }); toast.success("Cuenta creada con éxito"); navigate("/dashboard"); }
+    try { await register({ username, password, role }); toast.success("Cuenta creada con éxito"); navigate("/dashboard"); }
     catch (err) { toast.error(err.message || "Error al registrarse"); }
     finally { setLoading(false); }
   };
@@ -59,7 +60,7 @@ export default function Register() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <img src="/logo2.png" alt="AGROFARM" className="w-12 h-12 rounded-2xl shadow-lg" />
+            <img src="/logo2.png" alt="AGROFARM" className="w-16 h-16 rounded-2xl shadow-lg" />
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">AGROFARM</h1>
               <p className="text-xs text-gray-400 font-medium">Gestión Porcina</p>
@@ -79,6 +80,18 @@ export default function Register() {
                 <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Elige un nombre de usuario"
                   className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
                   required />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Rol</label>
+              <div className="relative">
+                <i className="fas fa-user-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <select value={role} onChange={(e) => setRole(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm appearance-none">
+                  <option value="USER">Usuario</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
               </div>
             </div>
 

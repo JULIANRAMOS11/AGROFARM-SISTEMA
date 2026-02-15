@@ -67,9 +67,13 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <img src="/logo2.png" alt="AGROFARM" className="w-12 h-12 rounded-2xl shadow-lg" />
-            <div>
+          <div className="lg:hidden flex flex-col items-center gap-4 mb-10">
+            <div className="relative">
+              <img src="/logo2.png" alt="AGROFARM" className="w-20 h-20 rounded-2xl shadow-xl" />
+              <div className="absolute -left-8 top-2 text-3xl animate-float">🐷</div>
+              <div className="absolute -right-8 top-2 text-3xl animate-float" style={{animationDelay: '1.5s'}}>🐖</div>
+            </div>
+            <div className="text-center">
               <h1 className="text-2xl font-extrabold text-slate-800">AGROFARM</h1>
               <p className="text-xs text-gray-400 font-medium">Gestión Porcina</p>
             </div>

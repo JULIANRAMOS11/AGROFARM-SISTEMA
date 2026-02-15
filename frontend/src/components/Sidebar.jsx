@@ -23,9 +23,9 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }) {
       {/* Logo original AGROFARM */}
       <div className="px-5 py-5 border-b border-slate-700/50">
         <NavLink to="/dashboard" className="flex items-center gap-3">
-          <img src="/logo2.png" alt="AGROFARM" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
+          <img src="/logo2.png" alt="AGROFARM" className="w-16 h-16 rounded-xl object-cover shadow-2xl" />
           <div>
-            <h1 className="text-lg font-extrabold text-white tracking-tight">AGROFARM</h1>
+            <h1 className="text-xl font-extrabold text-white tracking-tight">AGROFARM</h1>
             <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Gestión Porcina</p>
           </div>
         </NavLink>

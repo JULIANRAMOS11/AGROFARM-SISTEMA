@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { apiGet, apiPut, apiPost, getUser } from "../services/api";
+import { apiPut, apiPost, getUser } from "../services/api";
 
 export default function Perfil() {
   const [user, setUser] = useState(null);
@@ -12,17 +12,42 @@ export default function Perfil() {
 
   useEffect(() => {
     const load = async () => {
-      try { const data = await apiGet("/auth/profile"); setUser(data); setFormData({ nombre_completo: data.nombre_completo || "", email: data.email || "", telefono: data.telefono || "", cargo: data.cargo || "" }); }
-      catch { const local = getUser(); if (local) { setUser(local); setFormData({ nombre_completo: local.nombre_completo || "", email: local.email || "", telefono: local.telefono || "", cargo: local.cargo || "" }); } }
-      finally { setLoading(false); }
+      try { 
+        const local = getUser(); 
+        if (local) { 
+          setUser(local); 
+          setFormData({ 
+            nombre_completo: local.nombre_completo || "", 
+            email: local.email || "", 
+            telefono: local.telefono || "", 
+            cargo: local.cargo || "" 
+          }); 
+        }
+      } catch(err) {
+        toast.error("Error al cargar perfil");
+      } finally { 
+        setLoading(false); 
+      }
     };
     load();
   }, []);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    try { const updated = await apiPut("/auth/profile", formData); setUser(updated); setIsEditing(false); toast.success("Perfil actualizado"); }
-    catch (err) { toast.error(err.message || "Error al actualizar"); }
+    try { 
+      const currentUser = getUser();
+      if (!currentUser?.id) {
+        toast.error("Usuario no identificado");
+        return;
+      }
+      const updated = await apiPut(`/perfil/${currentUser.id}`, formData); 
+      setUser({...currentUser, ...updated}); 
+      localStorage.setItem("user", JSON.stringify({...currentUser, ...updated}));
+      setIsEditing(false); 
+      toast.success("Perfil actualizado exitosamente"); 
+    } catch (err) { 
+      toast.error(err.message || "Error al actualizar perfil"); 
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -90,7 +115,7 @@ export default function Perfil() {
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre Completo</label><input type="text" value={formData.nombre_completo} onChange={(e) => setFormData({ ...formData, nombre_completo: e.target.value })} className={inputClass} /></div>
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Email</label><input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputClass} /></div>
               <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Teléfono</label><input type="tel" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} className={inputClass} /></div>
-              <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cargo</label><input type="text" value={formData.cargo} onChange={(e) => setFormData({ ...formData, cargo: e.target.value })} className={inputClass} /></div>
+              <div><label className="block text-sm font-semibold text-slate-700 mb-1.5">Cargo</label><select value={formData.cargo} onChange={(e) => setFormData({ ...formData, cargo: e.target.value })} className={inputClass}><option value="">Seleccione cargo...</option><option value="Administrador">Administrador</option><option value="Veterinario">Veterinario</option><option value="Técnico">Técnico</option><option value="Operario">Operario</option><option value="Propietario">Propietario</option><option value="Supervisor">Supervisor</option></select></div>
             </div>
             <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
               <button type="submit" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300"><i className="fas fa-save"></i>Guardar</button>
