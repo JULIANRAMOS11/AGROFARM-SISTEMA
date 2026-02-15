@@ -101,14 +101,14 @@ INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva,
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Reproductores'), '2026-02-14', 2.8, 'MANTENIMIENTO', 'Ración diaria matutina.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), (SELECT id FROM alimentos WHERE nombre = 'Pasto King Grass Picado'), '2026-02-14', 1.2, 'MANTENIMIENTO', 'Forraje complementario tarde.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-002'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Reproductores'), '2026-02-14', 2.6, 'MANTENIMIENTO', 'Ración diaria.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Reproductores'), '2026-02-14', 3.0, 'MANTENIMIENTO', 'Mayor ración por peso corporal elevado.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Reproductores'), '2026-02-14', 3.0, 'MANTENIMIENTO', 'Mayor ración por peso corporal elevado.');
 
 -- Consumos de Cerdas Gestantes
 INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva, observaciones) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Gestación Maternal'), '2026-02-14', 2.5, 'GESTACION', 'Día 85 de gestación. Estado corporal óptimo.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-002'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Gestación Maternal'), '2026-02-14', 2.3, 'GESTACION', 'Primera gestación. Día 62.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-003'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Gestación Maternal'), '2026-02-14', 2.6, 'GESTACION', 'Gestación avanzada. Excelente apetito.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'CER-005'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Lactancia Premium'), '2026-02-14', 5.8, 'LACTANCIA', 'Lactancia activa. 11 lechones amamantando.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'CER-005'), (SELECT id FROM alimentos WHERE nombre = 'Balanceado Lactancia Premium'), '2026-02-14', 5.8, 'LACTANCIA', 'Lactancia activa. 11 lechones amamantando.');
 
 -- Consumos de Lechones en Destete
 INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva, observaciones) VALUES
@@ -116,7 +116,7 @@ INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva,
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-002'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Inicio Premium'), '2026-02-14', 0.88, 'CRECIMIENTO', 'Consumo normal. Sin rechazos.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-003'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Inicio Premium'), '2026-02-14', 0.92, 'CRECIMIENTO', 'Apetito excelente.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-004'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Inicio Premium'), '2026-02-14', 1.05, 'CRECIMIENTO', 'Consumo superior al promedio.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'LEC-005'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Inicio Premium'), '2026-02-14', 0.82, 'CRECIMIENTO', 'Destete reciente. Consumo en aumento.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'LEC-005'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Inicio Premium'), '2026-02-14', 0.82, 'CRECIMIENTO', 'Destete reciente. Consumo en aumento.');
 
 -- Consumos de Cerdos en Engorde
 INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva, observaciones) VALUES
@@ -124,7 +124,7 @@ INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva,
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-002'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Engorde Superior'), '2026-02-14', 2.28, 'ENGORDE', 'Consumo estable.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-003'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Engorde Superior'), '2026-02-14', 2.15, 'ENGORDE', 'Hembra. Ración ajustada.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-004'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Engorde Superior'), '2026-02-14', 2.20, 'ENGORDE', 'Ganancia de peso constante.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'ENG-005'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Engorde Superior'), '2026-02-14', 2.40, 'ENGORDE', 'Híbrido. Mayor consumo.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'ENG-005'), (SELECT id FROM alimentos WHERE nombre = 'Concentrado Engorde Superior'), '2026-02-14', 2.40, 'ENGORDE', 'Híbrido. Mayor consumo.');
 
 -- Consumos de Finalizadores
 INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva, observaciones) VALUES
@@ -145,22 +145,25 @@ INSERT INTO consumos (pig_id, alimento_id, fecha, cantidad_kg, etapa_productiva,
 -- ====================================================================================================
 
 -- VACUNAS - Protocolo sanitario completo
-INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
+
 -- Vacunación Reproductores
+INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), 'VACUNA', '2026-01-15', NULL, 'Vacunación preventiva contra Circovirus Porcino', 'Circoflex 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Refuerzo semestral. Sin reacciones adversas. Próxima dosis: Julio 2026.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-002'), 'VACUNA', '2026-01-15', NULL, 'Vacunación contra Parvovirus y Leptospirosis', 'Parvo-Lepto 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Protocolo reproductores. Estado sanitario excelente.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), 'VACUNA', '2026-01-20', NULL, 'Vacuna contra Mal Rojo (Erisipela)', 'Erysorb 1ml', '1ml IM cuello', 'Dr. Julián Ramos García', 'Cerda gestante. Protocolo día 60 gestación.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-002'), 'VACUNA', '2026-02-01', NULL, 'Vacunación E. coli + Clostridium', 'Porcilis Porcoli 2ml', '2ml IM', 'Dra. Ana Martínez', 'Prevención diarreas neonatales. Primera gestación.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'CER-003'), 'VACUNA', '2026-01-25', NULL, 'Refuerzo Parvovirus', 'Parvo-Lepto 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Protocolo pre-parto. Cerda en excelente estado.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'CER-003'), 'VACUNA', '2026-01-25', NULL, 'Refuerzo Parvovirus', 'Parvo-Lepto 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Protocolo pre-parto. Cerda en excelente estado.');
 
 -- Vacunación Lechones
+INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-001'), 'VACUNA', '2026-01-05', NULL, 'Primera dosis Mycoplasma', 'M+PAC 1ml', '1ml IM', 'Dr. Julián Ramos García', 'Vacunación a los 7 días de vida. Aplicación en tabla del cuello.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-002'), 'VACUNA', '2026-01-05', NULL, 'Primera dosis Mycoplasma', 'M+PAC 1ml', '1ml IM', 'Dr. Julián Ramos García', 'Mismo lote que LEC-001. Sin complicaciones.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'LEC-003'), 'VACUNA', '2026-01-10', NULL, 'Circovirus PCV2', 'Circoflex 0.5ml', '0.5ml IM', 'Dra. Ana Martínez', 'Dosis para lechones. Protocolo estándar día 21.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'LEC-003'), 'VACUNA', '2026-01-10', NULL, 'Circovirus PCV2', 'Circoflex 0.5ml', '0.5ml IM', 'Dra. Ana Martínez', 'Dosis para lechones. Protocolo estándar día 21.');
 
 -- Vacunación Engorde
+INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-001'), 'VACUNA', '2025-12-20', NULL, 'Segunda dosis Mycoplasma', 'M+PAC 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Refuerzo a los 21 días. Inmunización completa.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'ENG-003'), 'VACUNA', '2025-12-22', NULL, 'Vacuna Aujeszky (Pseudorrabia)', 'Auskipra 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Protocolo preventivo regional. Zona endémica.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'ENG-003'), 'VACUNA', '2025-12-22', NULL, 'Vacuna Aujeszky (Pseudorrabia)', 'Auskipra 2ml', '2ml IM', 'Dr. Julián Ramos García', 'Protocolo preventivo regional. Zona endémica.');
 
 -- TRATAMIENTOS - Casos clínicos resueltos
 INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
@@ -168,7 +171,7 @@ INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, med
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-002'), 'TRATAMIENTO', '2026-02-05', 'Cojera leve pata posterior derecha', 'Antiinflamatorio + reposo', 'Meloxicam 2% + Penicilina', '0.4ml IM x 5 días', 'Dra. Ana Martínez', 'Posible traumatismo. Evolución favorable. Sin signos de infección.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-004'), 'TRATAMIENTO', '2026-01-18', 'Conjuntivitis bilateral leve', 'Limpieza ocular + antibiótico tópico', 'Terramicina oftálmica', 'Tópico 2 veces/día x 7 días', 'Dr. Julián Ramos García', 'Irritación por polvo ambiental. Mejora de ventilación en corral. Curación total.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-002'), 'TRATAMIENTO', '2026-01-12', 'Neumonía bacteriana leve', 'Antibioticoterapia + mucolítico', 'Tilmicosina 30% + Bromhexina', '1ml/10kg IM dosis única', 'Dr. Julián Ramos García', 'Detección temprana. Respuesta inmediata al tratamiento. Control a los 7 días: normal.'),
-((SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), 'TRATAMIENTO', '2026-02-08', 'Lesiones dérmicas leves (peleas)', 'Desinfección + cicatrizante', 'Yodán spray + Aluspray', 'Tópico diario', 'Dr. Julián Ramos García', 'Lesiones superficiales por jerarquía. Separación temporal. Curación en 10 días.'),
+((SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), 'TRATAMIENTO', '2026-02-08', 'Lesiones dérmicas leves (peleas)', 'Desinfección + cicatrizante', 'Yodán spray + Aluspray', 'Tópico diario', 'Dr. Julián Ramos García', 'Lesiones superficiales por jerarquía. Separación temporal. Curación en 10 días.');
 
 -- DIAGNÓSTICOS - Chequeos de rutina
 INSERT INTO sanidad (pig_id, tipo_registro, fecha, diagnostico, tratamiento, medicamento, dosis, veterinario, observaciones) VALUES
@@ -190,7 +193,6 @@ INSERT INTO produccion (pig_id, fecha, peso_kg, notas) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-001'), '2025-12-22', 8.20, 'Peso al destete (42 días). Transición exitosa.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-001'), '2026-01-15', 18.50, 'Post-destete 24 días. Crecimiento acelerado.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-001'), '2026-02-14', 32.50, 'Peso actual. Ganancia diaria excelente: 580g/día.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-002'), '2025-11-10', 1.38, 'Peso al nacer. Hermana de LEC-001.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-002'), '2025-12-22', 7.90, 'Peso al destete.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'LEC-002'), '2026-02-14', 29.80, 'Peso actual. Desarrollo normal.');
@@ -203,10 +205,8 @@ INSERT INTO produccion (pig_id, fecha, peso_kg, notas) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-001'), '2025-12-15', 52.40, 'Control mensual. Ganancia: 19.6kg en 30 días.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-001'), '2026-01-15', 68.90, 'Control mensual. Ganancia: 16.5kg en 31 días.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-001'), '2026-02-14', 78.40, 'Peso actual. Ganancia: 9.5kg en 30 días. GDP: 317g/día.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-002'), '2025-10-03', 8.90, 'Peso al destete.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-002'), '2026-02-14', 75.90, 'Peso actual. Conversión alimenticia eficiente: 2.8:1.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-003'), '2025-10-01', 9.10, 'Peso al destete. Hembra.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'ENG-003'), '2026-02-14', 71.20, 'Peso actual. Desarrollo uniforme.'),
 
@@ -217,10 +217,8 @@ INSERT INTO produccion (pig_id, fecha, peso_kg, notas) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-001'), '2025-10-15', 48.20, 'Control trimestral.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-001'), '2026-01-15', 102.80, 'Control mensual. Cerca de peso objetivo.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-001'), '2026-02-14', 115.60, 'Peso final comercial. Listo para venta. GDP promedio: 640g/día desde nacimiento.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-002'), '2026-01-12', 105.60, 'Penúltimo control.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-002'), '2026-02-14', 118.20, 'Peso final. Cliente reservado. Calidad premium.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'FIN-003'), '2026-02-14', 112.90, 'Peso actual. Raza Pietrain: excelente magro.');
 
 -- Registro de pesos Reproductores (mantenimiento)
@@ -228,7 +226,6 @@ INSERT INTO produccion (pig_id, fecha, peso_kg, notas) VALUES
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2024-06-15', 215.50, 'Peso al inicio vida reproductiva.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2025-06-15', 268.20, 'Control anual. Condición corporal excelente.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2026-02-14', 285.50, 'Peso actual. Verraco principal. Salud óptima.'),
-
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), '2024-10-20', 142.30, 'Peso primera monta.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), '2025-02-15', 168.90, 'Post primer parto.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), '2026-02-14', 195.40, 'Peso actual gestación. 3er parto próximo.');
@@ -244,14 +241,11 @@ INSERT INTO reproduccion (cerda_id, verraco_id, fecha_monta, metodo, estado, fec
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-002'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-002'), '2025-12-18', 'INSEMINACION_ARTIFICIAL', 'CONFIRMADA', '2026-04-11', 'Primera gestación. IA con semen importado. Confirmación ultrasonográfica día 28. 10 fetos detectados.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-003'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2025-11-20', 'NATURAL', 'CONFIRMADA', '2026-03-14', 'Segunda gestación. Monta natural exitosa. Excelente condición corporal.'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-005'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), '2025-10-18', 'NATURAL', 'CONFIRMADA', '2026-02-09', 'Segunda gestación. Actualmente en lactancia del parto anterior. Camada de 11 lechones.'),
-
 -- Montas pendientes de confirmación
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-004'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-002'), '2026-02-05', 'NATURAL', 'PENDIENTE', '2026-05-30', 'Primera monta. Cerda novilla preparada. Confirmación pendiente día 21 (26/Feb).'),
-
 -- Montas históricas exitosas (referencia)
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-001'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2025-05-10', 'NATURAL', 'CONFIRMADA', '2025-09-01', 'Segunda gestación histórica. Parto exitoso 28/Ago/2025. 11 lechones nacidos (10 vivos).'),
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-005'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-003'), '2025-06-20', 'NATURAL', 'CONFIRMADA', '2025-10-12', 'Primera gestación histórica. Parto 08/Oct/2025. 12 lechones nacidos (11 vivos).'),
-
 -- Monta fallida (registro de aprendizaje)
 ((SELECT id FROM pigs WHERE codigo_arete = 'CER-004'), (SELECT id FROM pigs WHERE codigo_arete = 'VER-001'), '2026-01-10', 'NATURAL', 'FALLIDA', '2026-04-28', 'Primera monta fallida. Sin confirmación de gestación día 28. Repetición programada con otro verraco.');
 
