@@ -1,66 +1,63 @@
-// src/components/PigList.jsx
-/**
- * Tabla que muestra el listado de cerdos registrados.
- */
+// src/components/PigList.jsx — Tabla moderna de cerdos
 function PigList({ pigs, onToggleStatus }) {
   if (pigs.length === 0) {
     return (
-      <div className="text-center py-12">
-        <i className="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-        <p className="text-gray-500">No hay cerdos registrados todavía.</p>
+      <div className="empty-state">
+        <i className="fas fa-paw"></i>
+        <p>No hay cerdos registrados todavía.</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
+    <div className="overflow-x-auto rounded-xl">
+      <table className="table-modern">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Código Arete</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sexo</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Peso (kg)</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha Nacimiento</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+          <tr>
+            <th>Código Arete</th>
+            <th>Sexo</th>
+            <th>Peso (kg)</th>
+            <th>Fecha Nacimiento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {pigs.map((cerdo) => (
-            <tr key={cerdo.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-3 text-sm font-medium text-gray-900">{cerdo.codigo_arete}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">
+            <tr key={cerdo.id}>
+              <td className="font-semibold text-gray-900">{cerdo.codigo_arete}</td>
+              <td>
                 {cerdo.sexo === "M" ? (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    <i className="fas fa-mars mr-1"></i> Macho
+                  <span className="badge bg-blue-50 text-blue-700 border border-blue-100">
+                    <i className="fas fa-mars text-xs"></i> Macho
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-                    <i className="fas fa-venus mr-1"></i> Hembra
+                  <span className="badge bg-pink-50 text-pink-700 border border-pink-100">
+                    <i className="fas fa-venus text-xs"></i> Hembra
                   </span>
                 )}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-700">{cerdo.peso_actual}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{cerdo.fecha_nacimiento}</td>
-              <td className="px-4 py-3 text-sm">
+              <td>{cerdo.peso_actual}</td>
+              <td>{cerdo.fecha_nacimiento}</td>
+              <td>
                 {cerdo.estado === "ACTIVO" ? (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <i className="fas fa-check-circle mr-1"></i> Activo
+                  <span className="badge bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <i className="fas fa-check-circle text-xs"></i> Activo
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    <i className="fas fa-times-circle mr-1"></i> Inactivo
+                  <span className="badge bg-gray-50 text-gray-600 border border-gray-200">
+                    <i className="fas fa-times-circle text-xs"></i> Inactivo
                   </span>
                 )}
               </td>
-              <td className="px-4 py-3 text-sm">
+              <td>
                 <button
                   type="button"
                   onClick={() => onToggleStatus(cerdo.id, cerdo.estado)}
-                  className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition-colors"
+                  className="btn-primary !py-1.5 !px-3 !text-xs !shadow-none"
                 >
-                  <i className="fas fa-sync-alt mr-1"></i>
-                  Cambiar estado
+                  <i className="fas fa-sync-alt text-[10px]"></i>
+                  Cambiar
                 </button>
               </td>
             </tr>

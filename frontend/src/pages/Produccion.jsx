@@ -8,15 +8,8 @@ export default function Produccion() {
   const [estadisticas, setEstadisticas] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    pig_id: "",
-    fecha: "",
-    peso: "",
-    edad_dias: "",
-    ganancia_diaria: "",
-    consumo_alimento_kg: "",
-    conversion_alimenticia: "",
-    lote: "",
-    observaciones: ""
+    pig_id: "", fecha: "", peso: "", edad_dias: "", ganancia_diaria: "",
+    consumo_alimento_kg: "", conversion_alimenticia: "", lote: "", observaciones: ""
   });
 
   useEffect(() => {
@@ -26,30 +19,18 @@ export default function Produccion() {
   }, []);
 
   const fetchRegistros = async () => {
-    try {
-      const data = await apiGet("/produccion");
-      setRegistros(data);
-    } catch (error) {
-      console.error("Error al cargar registros:", error);
-    }
+    try { const data = await apiGet("/produccion"); setRegistros(data); }
+    catch (error) { console.error("Error al cargar registros:", error); }
   };
 
   const fetchPigs = async () => {
-    try {
-      const data = await apiGet("/pigs");
-      setPigs(data);
-    } catch (error) {
-      console.error("Error al cargar cerdos:", error);
-    }
+    try { const data = await apiGet("/pigs"); setPigs(data); }
+    catch (error) { console.error("Error al cargar cerdos:", error); }
   };
 
   const fetchEstadisticas = async () => {
-    try {
-      const data = await apiGet("/produccion/estadisticas");
-      setEstadisticas(data);
-    } catch (error) {
-      console.error("Error al cargar estadísticas:", error);
-    }
+    try { const data = await apiGet("/produccion/estadisticas"); setEstadisticas(data); }
+    catch (error) { console.error("Error al cargar estadísticas:", error); }
   };
 
   const handleSubmit = async (e) => {
@@ -60,17 +41,7 @@ export default function Produccion() {
       setShowForm(false);
       fetchRegistros();
       fetchEstadisticas();
-      setFormData({
-        pig_id: "",
-        fecha: "",
-        peso: "",
-        edad_dias: "",
-        ganancia_diaria: "",
-        consumo_alimento_kg: "",
-        conversion_alimenticia: "",
-        lote: "",
-        observaciones: ""
-      });
+      setFormData({ pig_id: "", fecha: "", peso: "", edad_dias: "", ganancia_diaria: "", consumo_alimento_kg: "", conversion_alimenticia: "", lote: "", observaciones: "" });
     } catch (error) {
       console.error("Error al crear registro:", error);
       toast.error(error.message || "Error de conexión");
@@ -91,214 +62,139 @@ export default function Produccion() {
     }
   };
 
+  const miniStats = [
+    { label: "En Producción", value: estadisticas?.total_cerdos || 0, icon: "fa-paw", gradient: "from-blue-500 to-blue-600" },
+    { label: "Peso Prom. (kg)", value: estadisticas?.peso_promedio ? parseFloat(estadisticas.peso_promedio).toFixed(1) : "0", icon: "fa-weight-hanging", gradient: "from-emerald-500 to-emerald-600" },
+    { label: "Ganancia Diaria", value: estadisticas?.ganancia_promedio ? parseFloat(estadisticas.ganancia_promedio).toFixed(3) : "0", icon: "fa-arrow-trend-up", gradient: "from-purple-500 to-purple-600" },
+    { label: "Conv. Alimenticia", value: estadisticas?.conversion_promedio ? parseFloat(estadisticas.conversion_promedio).toFixed(2) : "0", icon: "fa-chart-simple", gradient: "from-amber-500 to-orange-600" },
+  ];
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">
-          <i className="fas fa-chart-line mr-2"></i>Producción
-        </h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-        >
-          <i className="fas fa-plus mr-2"></i>Nuevo Registro
+    <div className="space-y-5 animate-fadeIn">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <i className="fas fa-chart-line text-green-500"></i>Producción
+          </h2>
+          <p className="text-sm text-gray-400 mt-0.5">{registros.length} registros</p>
+        </div>
+        <button onClick={() => setShowForm(!showForm)} className="btn-primary">
+          <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+          {showForm ? "Cerrar" : "Nuevo Registro"}
         </button>
       </div>
 
-      {/* Estadísticas */}
+      {/* Mini Stats */}
       {estadisticas && (
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg shadow-md">
-            <div className="text-sm opacity-90">Cerdos en Producción</div>
-            <div className="text-3xl font-bold mt-2">{estadisticas.total_cerdos || 0}</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-lg shadow-md">
-            <div className="text-sm opacity-90">Peso Promedio (kg)</div>
-            <div className="text-3xl font-bold mt-2">
-              {estadisticas.peso_promedio ? parseFloat(estadisticas.peso_promedio).toFixed(2) : "0"}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {miniStats.map((stat, i) => (
+            <div key={stat.label} className={`stat-card bg-gradient-to-br ${stat.gradient} animate-slideUp`} style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="stat-icon"><i className={`fas ${stat.icon}`}></i></div>
+              <div className="stat-value text-xl">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
             </div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg shadow-md">
-            <div className="text-sm opacity-90">Ganancia Diaria (kg)</div>
-            <div className="text-3xl font-bold mt-2">
-              {estadisticas.ganancia_promedio ? parseFloat(estadisticas.ganancia_promedio).toFixed(3) : "0"}
-            </div>
-          </div>
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg shadow-md">
-            <div className="text-sm opacity-90">Conversión Alimenticia</div>
-            <div className="text-3xl font-bold mt-2">
-              {estadisticas.conversion_promedio ? parseFloat(estadisticas.conversion_promedio).toFixed(2) : "0"}
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
+      {/* Formulario */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-xl font-bold mb-4">Nuevo Registro de Producción</h3>
-          <div className="grid grid-cols-3 gap-4">
+        <form onSubmit={handleSubmit} className="glass-card p-6 animate-scaleIn">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i className="fas fa-plus-circle text-green-500"></i>Nuevo Registro de Producción
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-semibold mb-1">Cerdo</label>
-              <select
-                value={formData.pig_id}
-                onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                required
-              >
+              <label className="form-label">Cerdo <span className="required">*</span></label>
+              <select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className="input-modern" required>
                 <option value="">Seleccione...</option>
-                {pigs.map((pig) => (
-                  <option key={pig.id} value={pig.id}>
-                    {pig.codigo_arete} - {pig.sexo}
-                  </option>
-                ))}
+                {pigs.map((pig) => <option key={pig.id} value={pig.id}>{pig.codigo_arete} - {pig.sexo}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Fecha</label>
-              <input
-                type="date"
-                value={formData.fecha}
-                onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                required
-              />
+              <label className="form-label">Fecha <span className="required">*</span></label>
+              <input type="date" value={formData.fecha} onChange={(e) => setFormData({ ...formData, fecha: e.target.value })} className="input-modern" required />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Peso (kg)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.peso}
-                onChange={(e) => setFormData({ ...formData, peso: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                required
-                placeholder="0.00"
-                min="0"
-              />
+              <label className="form-label">Peso (kg) <span className="required">*</span></label>
+              <input type="number" step="0.01" value={formData.peso} onChange={(e) => setFormData({ ...formData, peso: e.target.value })} className="input-modern" required placeholder="0.00" min="0" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Edad (días)</label>
-              <input
-                type="number"
-                value={formData.edad_dias}
-                onChange={(e) => setFormData({ ...formData, edad_dias: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                min="0"
-              />
+              <label className="form-label">Edad (días)</label>
+              <input type="number" value={formData.edad_dias} onChange={(e) => setFormData({ ...formData, edad_dias: e.target.value })} className="input-modern" min="0" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Ganancia Diaria (kg)</label>
-              <input
-                type="number"
-                step="0.001"
-                value={formData.ganancia_diaria}
-                onChange={(e) => setFormData({ ...formData, ganancia_diaria: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="0.000"
-              />
+              <label className="form-label">Ganancia Diaria (kg)</label>
+              <input type="number" step="0.001" value={formData.ganancia_diaria} onChange={(e) => setFormData({ ...formData, ganancia_diaria: e.target.value })} className="input-modern" placeholder="0.000" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Consumo Alimento (kg)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.consumo_alimento_kg}
-                onChange={(e) => setFormData({ ...formData, consumo_alimento_kg: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="0.00"
-                min="0"
-              />
+              <label className="form-label">Consumo Alimento (kg)</label>
+              <input type="number" step="0.01" value={formData.consumo_alimento_kg} onChange={(e) => setFormData({ ...formData, consumo_alimento_kg: e.target.value })} className="input-modern" placeholder="0.00" min="0" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Conversión Alimenticia</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.conversion_alimenticia}
-                onChange={(e) => setFormData({ ...formData, conversion_alimenticia: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                placeholder="0.00"
-                min="0"
-              />
+              <label className="form-label">Conversión Alimenticia</label>
+              <input type="number" step="0.01" value={formData.conversion_alimenticia} onChange={(e) => setFormData({ ...formData, conversion_alimenticia: e.target.value })} className="input-modern" placeholder="0.00" min="0" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Lote</label>
-              <input
-                type="text"
-                value={formData.lote}
-                onChange={(e) => setFormData({ ...formData, lote: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-              />
+              <label className="form-label">Lote</label>
+              <input type="text" value={formData.lote} onChange={(e) => setFormData({ ...formData, lote: e.target.value })} className="input-modern" />
             </div>
-            <div className="col-span-3">
-              <label className="block text-sm font-semibold mb-1">Observaciones</label>
-              <textarea
-                value={formData.observaciones}
-                onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                rows="2"
-              />
+            <div className="md:col-span-3">
+              <label className="form-label">Observaciones</label>
+              <textarea value={formData.observaciones} onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })} className="input-modern" rows="2" />
             </div>
           </div>
-          <div className="flex gap-2 mt-4">
-            <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-              Guardar
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="bg-gray-300 px-6 py-2 rounded-lg"
-            >
-              Cancelar
-            </button>
+          <div className="flex gap-2 mt-5">
+            <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar</button>
+            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">Cancelar</button>
           </div>
         </form>
       )}
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-green-600 text-white">
-            <tr>
-              <th className="px-4 py-3 text-left">Cerdo</th>
-              <th className="px-4 py-3 text-left">Fecha</th>
-              <th className="px-4 py-3 text-center">Peso (kg)</th>
-              <th className="px-4 py-3 text-center">Edad (días)</th>
-              <th className="px-4 py-3 text-center">Ganancia Diaria</th>
-              <th className="px-4 py-3 text-center">Consumo (kg)</th>
-              <th className="px-4 py-3 text-center">Conv. Alim.</th>
-              <th className="px-4 py-3 text-left">Lote</th>
-              <th className="px-4 py-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registros.map((registro) => (
-              <tr key={registro.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-semibold">{registro.codigo_arete}</td>
-                <td className="px-4 py-3">{new Date(registro.fecha).toLocaleDateString()}</td>
-                <td className="px-4 py-3 text-center font-bold text-green-600">{parseFloat(registro.peso).toFixed(2)}</td>
-                <td className="px-4 py-3 text-center">{registro.edad_dias || "-"}</td>
-                <td className="px-4 py-3 text-center">
-                  {registro.ganancia_diaria ? parseFloat(registro.ganancia_diaria).toFixed(3) : "-"}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {registro.consumo_alimento_kg ? parseFloat(registro.consumo_alimento_kg).toFixed(2) : "-"}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {registro.conversion_alimenticia ? parseFloat(registro.conversion_alimenticia).toFixed(2) : "-"}
-                </td>
-                <td className="px-4 py-3">{registro.lote || "-"}</td>
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => handleDelete(registro.id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <i className="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Tabla */}
+      <div className="glass-card overflow-hidden">
+        {registros.length === 0 ? (
+          <div className="empty-state">
+            <i className="fas fa-chart-line"></i>
+            <p>No hay registros de producción todavía.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table-modern">
+              <thead>
+                <tr>
+                  <th>Cerdo</th>
+                  <th>Fecha</th>
+                  <th>Peso (kg)</th>
+                  <th>Edad</th>
+                  <th>Ganancia</th>
+                  <th>Consumo</th>
+                  <th>Conv.</th>
+                  <th>Lote</th>
+                  <th className="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registros.map((r) => (
+                  <tr key={r.id}>
+                    <td className="font-semibold text-gray-900">{r.codigo_arete}</td>
+                    <td>{new Date(r.fecha).toLocaleDateString()}</td>
+                    <td><span className="font-bold text-emerald-600">{parseFloat(r.peso).toFixed(2)}</span></td>
+                    <td>{r.edad_dias || "—"}</td>
+                    <td>{r.ganancia_diaria ? parseFloat(r.ganancia_diaria).toFixed(3) : "—"}</td>
+                    <td>{r.consumo_alimento_kg ? parseFloat(r.consumo_alimento_kg).toFixed(2) : "—"}</td>
+                    <td>{r.conversion_alimenticia ? parseFloat(r.conversion_alimenticia).toFixed(2) : "—"}</td>
+                    <td>{r.lote || "—"}</td>
+                    <td className="text-center">
+                      <button onClick={() => handleDelete(r.id)} className="btn-danger"><i className="fas fa-trash text-xs"></i></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,56 +10,28 @@ export default function Reproduccion() {
   const [showForm, setShowForm] = useState(false);
   const [showPartoForm, setShowPartoForm] = useState(false);
   const [formData, setFormData] = useState({
-    pig_id: "",
-    tipo_servicio: "MONTA_NATURAL",
-    fecha_servicio: "",
-    verraco: "",
-    fecha_probable_parto: "",
-    estado: "GESTANTE",
-    observaciones: ""
+    pig_id: "", tipo_servicio: "MONTA_NATURAL", fecha_servicio: "",
+    verraco: "", fecha_probable_parto: "", estado: "GESTANTE", observaciones: ""
   });
   const [partoData, setPartoData] = useState({
-    reproduccion_id: "",
-    pig_id: "",
-    fecha_parto: "",
-    lechones_nacidos_vivos: 0,
-    lechones_nacidos_muertos: 0,
-    lechones_momificados: 0,
-    peso_promedio_lechon: "",
-    observaciones: ""
+    reproduccion_id: "", pig_id: "", fecha_parto: "",
+    lechones_nacidos_vivos: 0, lechones_nacidos_muertos: 0,
+    lechones_momificados: 0, peso_promedio_lechon: "", observaciones: ""
   });
 
-  useEffect(() => {
-    fetchServicios();
-    fetchPartos();
-    fetchPigs();
-  }, []);
+  useEffect(() => { fetchServicios(); fetchPartos(); fetchPigs(); }, []);
 
   const fetchServicios = async () => {
-    try {
-      const data = await apiGet("/reproduccion");
-      setServicios(data);
-    } catch (error) {
-      console.error("Error al cargar servicios:", error);
-    }
+    try { const data = await apiGet("/reproduccion"); setServicios(data); }
+    catch (error) { console.error("Error al cargar servicios:", error); }
   };
-
   const fetchPartos = async () => {
-    try {
-      const data = await apiGet("/reproduccion/partos/all");
-      setPartos(data);
-    } catch (error) {
-      console.error("Error al cargar partos:", error);
-    }
+    try { const data = await apiGet("/reproduccion/partos/all"); setPartos(data); }
+    catch (error) { console.error("Error al cargar partos:", error); }
   };
-
   const fetchPigs = async () => {
-    try {
-      const data = await apiGet("/pigs");
-      setPigs(data.filter(p => p.sexo === "H" || p.sexo === "Hembra"));
-    } catch (error) {
-      console.error("Error al cargar cerdos:", error);
-    }
+    try { const data = await apiGet("/pigs"); setPigs(data.filter(p => p.sexo === "H" || p.sexo === "Hembra")); }
+    catch (error) { console.error("Error al cargar cerdos:", error); }
   };
 
   const handleSubmit = async (e) => {
@@ -67,21 +39,9 @@ export default function Reproduccion() {
     try {
       await apiPost("/reproduccion", formData);
       toast.success("Servicio registrado exitosamente");
-      setShowForm(false);
-      fetchServicios();
-      setFormData({
-        pig_id: "",
-        tipo_servicio: "MONTA_NATURAL",
-        fecha_servicio: "",
-        verraco: "",
-        fecha_probable_parto: "",
-        estado: "GESTANTE",
-        observaciones: ""
-      });
-    } catch (error) {
-      console.error("Error al crear servicio:", error);
-      toast.error(error.message || "Error de conexión al servidor");
-    }
+      setShowForm(false); fetchServicios();
+      setFormData({ pig_id: "", tipo_servicio: "MONTA_NATURAL", fecha_servicio: "", verraco: "", fecha_probable_parto: "", estado: "GESTANTE", observaciones: "" });
+    } catch (error) { toast.error(error.message || "Error de conexión"); }
   };
 
   const handlePartoSubmit = async (e) => {
@@ -89,357 +49,233 @@ export default function Reproduccion() {
     try {
       await apiPost("/reproduccion/partos", partoData);
       toast.success("Parto registrado exitosamente");
-      setShowPartoForm(false);
-      fetchPartos();
-      fetchServicios();
-      setPartoData({
-        reproduccion_id: "",
-        pig_id: "",
-        fecha_parto: "",
-        lechones_nacidos_vivos: 0,
-        lechones_nacidos_muertos: 0,
-        lechones_momificados: 0,
-        peso_promedio_lechon: "",
-        observaciones: ""
-      });
-    } catch (error) {
-      console.error("Error al registrar parto:", error);
-      toast.error(error.message || "Error de conexión al servidor");
-    }
+      setShowPartoForm(false); fetchPartos(); fetchServicios();
+      setPartoData({ reproduccion_id: "", pig_id: "", fecha_parto: "", lechones_nacidos_vivos: 0, lechones_nacidos_muertos: 0, lechones_momificados: 0, peso_promedio_lechon: "", observaciones: "" });
+    } catch (error) { toast.error(error.message || "Error de conexión"); }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Eliminar este registro?")) {
-      try {
-        await apiDelete(`/reproduccion/${id}`);
-        toast.success("Registro eliminado");
-        fetchServicios();
-      } catch (error) {
-        console.error("Error al eliminar:", error);
-        toast.error(error.message || "Error de conexión");
-      }
+      try { await apiDelete(`/reproduccion/${id}`); toast.success("Registro eliminado"); fetchServicios(); }
+      catch (error) { toast.error(error.message || "Error de conexión"); }
     }
   };
 
   const getEstadoBadge = (estado) => {
-    const colors = {
-      GESTANTE: "bg-yellow-100 text-yellow-800",
-      CONFIRMADA: "bg-blue-100 text-blue-800",
-      FALLIDA: "bg-red-100 text-red-800",
-      PARTO_REALIZADO: "bg-green-100 text-green-800"
+    const styles = {
+      GESTANTE: "bg-amber-50 text-amber-700 border-amber-100",
+      CONFIRMADA: "bg-blue-50 text-blue-700 border-blue-100",
+      FALLIDA: "bg-red-50 text-red-700 border-red-100",
+      PARTO_REALIZADO: "bg-emerald-50 text-emerald-700 border-emerald-100"
     };
-    return colors[estado] || "bg-gray-100 text-gray-800";
+    return styles[estado] || "bg-gray-50 text-gray-700 border-gray-100";
   };
 
+  const tabs = [
+    { id: "servicios", label: "Servicios", icon: "fa-syringe" },
+    { id: "partos", label: "Partos", icon: "fa-baby" },
+  ];
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">
-          <i className="fas fa-baby mr-2"></i>Reproducción
-        </h2>
+    <div className="space-y-5 animate-fadeIn">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <i className="fas fa-baby text-green-500"></i>Reproducción
+          </h2>
+          <p className="text-sm text-gray-400 mt-0.5">{servicios.length} servicios · {partos.length} partos</p>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab("servicios")}
-          className={`pb-2 px-4 font-semibold ${activeTab === "servicios"
-            ? "border-b-2 border-green-600 text-green-600"
-            : "text-gray-600"
-            }`}
-        >
-          Servicios
-        </button>
-        <button
-          onClick={() => setActiveTab("partos")}
-          className={`pb-2 px-4 font-semibold ${activeTab === "partos"
-            ? "border-b-2 border-green-600 text-green-600"
-            : "text-gray-600"
-            }`}
-        >
-          Partos
-        </button>
+      {/* Tabs modernos */}
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${activeTab === tab.id
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+              }`}
+          >
+            <i className={`fas ${tab.icon} text-xs`}></i>{tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Tab: Servicios */}
       {activeTab === "servicios" && (
-        <div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="mb-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-          >
-            <i className="fas fa-plus mr-2"></i>Nuevo Servicio
+        <div className="space-y-4 animate-fadeIn">
+          <button onClick={() => setShowForm(!showForm)} className="btn-primary">
+            <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showForm ? "Cerrar" : "Nuevo Servicio"}
           </button>
 
           {showForm && (
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="glass-card p-6 animate-scaleIn">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i className="fas fa-syringe text-green-500"></i>Nuevo Servicio
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Cerda</label>
-                  <select
-                    value={formData.pig_id}
-                    onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  >
+                  <label className="form-label">Cerda <span className="required">*</span></label>
+                  <select value={formData.pig_id} onChange={(e) => setFormData({ ...formData, pig_id: e.target.value })} className="input-modern" required>
                     <option value="">Seleccione...</option>
-                    {pigs.map((pig) => (
-                      <option key={pig.id} value={pig.id}>
-                        {pig.codigo_arete}
-                      </option>
-                    ))}
+                    {pigs.map((pig) => <option key={pig.id} value={pig.id}>{pig.codigo_arete}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Tipo de Servicio</label>
-                  <select
-                    value={formData.tipo_servicio}
-                    onChange={(e) => setFormData({ ...formData, tipo_servicio: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  >
+                  <label className="form-label">Tipo de Servicio</label>
+                  <select value={formData.tipo_servicio} onChange={(e) => setFormData({ ...formData, tipo_servicio: e.target.value })} className="input-modern">
                     <option value="MONTA_NATURAL">Monta Natural</option>
                     <option value="INSEMINACION">Inseminación</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Fecha Servicio</label>
-                  <input
-                    type="date"
-                    value={formData.fecha_servicio}
-                    onChange={(e) => setFormData({ ...formData, fecha_servicio: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  />
+                  <label className="form-label">Fecha Servicio <span className="required">*</span></label>
+                  <input type="date" value={formData.fecha_servicio} onChange={(e) => setFormData({ ...formData, fecha_servicio: e.target.value })} className="input-modern" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Verraco</label>
-                  <input
-                    type="text"
-                    value={formData.verraco}
-                    onChange={(e) => setFormData({ ...formData, verraco: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
+                  <label className="form-label">Verraco</label>
+                  <input type="text" value={formData.verraco} onChange={(e) => setFormData({ ...formData, verraco: e.target.value })} className="input-modern" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Fecha Probable Parto</label>
-                  <input
-                    type="date"
-                    value={formData.fecha_probable_parto}
-                    onChange={(e) => setFormData({ ...formData, fecha_probable_parto: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
+                  <label className="form-label">Fecha Probable Parto</label>
+                  <input type="date" value={formData.fecha_probable_parto} onChange={(e) => setFormData({ ...formData, fecha_probable_parto: e.target.value })} className="input-modern" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Estado</label>
-                  <select
-                    value={formData.estado}
-                    onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  >
+                  <label className="form-label">Estado</label>
+                  <select value={formData.estado} onChange={(e) => setFormData({ ...formData, estado: e.target.value })} className="input-modern">
                     <option value="GESTANTE">Gestante</option>
                     <option value="CONFIRMADA">Confirmada</option>
                     <option value="FALLIDA">Fallida</option>
                   </select>
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold mb-1">Observaciones</label>
-                  <textarea
-                    value={formData.observaciones}
-                    onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    rows="2"
-                  />
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label className="form-label">Observaciones</label>
+                  <textarea value={formData.observaciones} onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })} className="input-modern" rows="2" />
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="bg-gray-300 px-6 py-2 rounded-lg"
-                >
-                  Cancelar
-                </button>
+              <div className="flex gap-2 mt-5">
+                <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar</button>
+                <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">Cancelar</button>
               </div>
             </form>
           )}
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-green-600 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left">Cerda</th>
-                  <th className="px-4 py-3 text-left">Tipo</th>
-                  <th className="px-4 py-3 text-left">Fecha Servicio</th>
-                  <th className="px-4 py-3 text-left">Verraco</th>
-                  <th className="px-4 py-3 text-left">Fecha Probable Parto</th>
-                  <th className="px-4 py-3 text-left">Estado</th>
-                  <th className="px-4 py-3 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {servicios.map((servicio) => (
-                  <tr key={servicio.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3">{servicio.codigo_arete}</td>
-                    <td className="px-4 py-3">{servicio.tipo_servicio}</td>
-                    <td className="px-4 py-3">{new Date(servicio.fecha_servicio).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{servicio.verraco || "-"}</td>
-                    <td className="px-4 py-3">
-                      {servicio.fecha_probable_parto ? new Date(servicio.fecha_probable_parto).toLocaleDateString() : "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${getEstadoBadge(servicio.estado)}`}>
-                        {servicio.estado}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => handleDelete(servicio.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="glass-card overflow-hidden">
+            {servicios.length === 0 ? (
+              <div className="empty-state"><i className="fas fa-syringe"></i><p>No hay servicios registrados.</p></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Cerda</th><th>Tipo</th><th>Fecha</th><th>Verraco</th><th>Parto Prob.</th><th>Estado</th><th className="text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {servicios.map((s) => (
+                      <tr key={s.id}>
+                        <td className="font-semibold text-gray-900">{s.codigo_arete}</td>
+                        <td><span className="badge bg-blue-50 text-blue-700 border border-blue-100">{s.tipo_servicio}</span></td>
+                        <td>{new Date(s.fecha_servicio).toLocaleDateString()}</td>
+                        <td>{s.verraco || "—"}</td>
+                        <td>{s.fecha_probable_parto ? new Date(s.fecha_probable_parto).toLocaleDateString() : "—"}</td>
+                        <td><span className={`badge border ${getEstadoBadge(s.estado)}`}>{s.estado}</span></td>
+                        <td className="text-center">
+                          <button onClick={() => handleDelete(s.id)} className="btn-danger"><i className="fas fa-trash text-xs"></i></button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Tab: Partos */}
       {activeTab === "partos" && (
-        <div>
-          <button
-            onClick={() => setShowPartoForm(!showPartoForm)}
-            className="mb-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-          >
-            <i className="fas fa-plus mr-2"></i>Registrar Parto
+        <div className="space-y-4 animate-fadeIn">
+          <button onClick={() => setShowPartoForm(!showPartoForm)} className="btn-primary">
+            <i className={`fas ${showPartoForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showPartoForm ? "Cerrar" : "Registrar Parto"}
           </button>
 
           {showPartoForm && (
-            <form onSubmit={handlePartoSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handlePartoSubmit} className="glass-card p-6 animate-scaleIn">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i className="fas fa-baby text-green-500"></i>Registrar Parto
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Cerda</label>
-                  <select
-                    value={partoData.pig_id}
-                    onChange={(e) => setPartoData({ ...partoData, pig_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  >
+                  <label className="form-label">Cerda <span className="required">*</span></label>
+                  <select value={partoData.pig_id} onChange={(e) => setPartoData({ ...partoData, pig_id: e.target.value })} className="input-modern" required>
                     <option value="">Seleccione...</option>
-                    {pigs.map((pig) => (
-                      <option key={pig.id} value={pig.id}>
-                        {pig.codigo_arete}
-                      </option>
-                    ))}
+                    {pigs.map((pig) => <option key={pig.id} value={pig.id}>{pig.codigo_arete}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Fecha Parto</label>
-                  <input
-                    type="date"
-                    value={partoData.fecha_parto}
-                    onChange={(e) => setPartoData({ ...partoData, fecha_parto: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  />
+                  <label className="form-label">Fecha Parto <span className="required">*</span></label>
+                  <input type="date" value={partoData.fecha_parto} onChange={(e) => setPartoData({ ...partoData, fecha_parto: e.target.value })} className="input-modern" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Lechones Vivos</label>
-                  <input
-                    type="number"
-                    value={partoData.lechones_nacidos_vivos}
-                    onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_vivos: parseInt(e.target.value) })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Lechones Vivos</label>
+                  <input type="number" value={partoData.lechones_nacidos_vivos} onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_vivos: parseInt(e.target.value) })} className="input-modern" min="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Lechones Muertos</label>
-                  <input
-                    type="number"
-                    value={partoData.lechones_nacidos_muertos}
-                    onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_muertos: parseInt(e.target.value) })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Lechones Muertos</label>
+                  <input type="number" value={partoData.lechones_nacidos_muertos} onChange={(e) => setPartoData({ ...partoData, lechones_nacidos_muertos: parseInt(e.target.value) })} className="input-modern" min="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Momificados</label>
-                  <input
-                    type="number"
-                    value={partoData.lechones_momificados}
-                    onChange={(e) => setPartoData({ ...partoData, lechones_momificados: parseInt(e.target.value) })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Momificados</label>
+                  <input type="number" value={partoData.lechones_momificados} onChange={(e) => setPartoData({ ...partoData, lechones_momificados: parseInt(e.target.value) })} className="input-modern" min="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Peso Promedio (kg)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={partoData.peso_promedio_lechon}
-                    onChange={(e) => setPartoData({ ...partoData, peso_promedio_lechon: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Peso Promedio (kg)</label>
+                  <input type="number" step="0.01" value={partoData.peso_promedio_lechon} onChange={(e) => setPartoData({ ...partoData, peso_promedio_lechon: e.target.value })} className="input-modern" min="0" />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold mb-1">Observaciones</label>
-                  <textarea
-                    value={partoData.observaciones}
-                    onChange={(e) => setPartoData({ ...partoData, observaciones: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    rows="2"
-                  />
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label className="form-label">Observaciones</label>
+                  <textarea value={partoData.observaciones} onChange={(e) => setPartoData({ ...partoData, observaciones: e.target.value })} className="input-modern" rows="2" />
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowPartoForm(false)}
-                  className="bg-gray-300 px-6 py-2 rounded-lg"
-                >
-                  Cancelar
-                </button>
+              <div className="flex gap-2 mt-5">
+                <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar</button>
+                <button type="button" onClick={() => setShowPartoForm(false)} className="btn-secondary">Cancelar</button>
               </div>
             </form>
           )}
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-green-600 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left">Cerda</th>
-                  <th className="px-4 py-3 text-left">Fecha Parto</th>
-                  <th className="px-4 py-3 text-center">Vivos</th>
-                  <th className="px-4 py-3 text-center">Muertos</th>
-                  <th className="px-4 py-3 text-center">Momificados</th>
-                  <th className="px-4 py-3 text-center">Peso Prom (kg)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {partos.map((parto) => (
-                  <tr key={parto.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3">{parto.codigo_arete}</td>
-                    <td className="px-4 py-3">{new Date(parto.fecha_parto).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 text-center text-green-600 font-bold">{parto.lechones_nacidos_vivos}</td>
-                    <td className="px-4 py-3 text-center text-red-600">{parto.lechones_nacidos_muertos}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{parto.lechones_momificados}</td>
-                    <td className="px-4 py-3 text-center">{parto.peso_promedio_lechon || "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="glass-card overflow-hidden">
+            {partos.length === 0 ? (
+              <div className="empty-state"><i className="fas fa-baby"></i><p>No hay partos registrados.</p></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Cerda</th><th>Fecha</th><th>Vivos</th><th>Muertos</th><th>Momific.</th><th>Peso Prom.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {partos.map((p) => (
+                      <tr key={p.id}>
+                        <td className="font-semibold text-gray-900">{p.codigo_arete}</td>
+                        <td>{new Date(p.fecha_parto).toLocaleDateString()}</td>
+                        <td><span className="font-bold text-emerald-600">{p.lechones_nacidos_vivos}</span></td>
+                        <td><span className="text-red-500">{p.lechones_nacidos_muertos}</span></td>
+                        <td>{p.lechones_momificados}</td>
+                        <td>{p.peso_promedio_lechon || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

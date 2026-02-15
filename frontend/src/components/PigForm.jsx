@@ -1,10 +1,6 @@
-// src/components/PigForm.jsx
+// src/components/PigForm.jsx — Formulario moderno para registrar cerdos
 import { useState } from "react";
 
-/**
- * Formulario controlado para registrar cerdos.
- * Contiene validaciones básicas de los campos.
- */
 function PigForm({ onAddPig }) {
   const [form, setForm] = useState({
     codigo_arete: "",
@@ -16,34 +12,27 @@ function PigForm({ onAddPig }) {
 
   const [errors, setErrors] = useState({});
 
-  // Actualiza el estado del formulario cuando el usuario escribe
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validaciones simples de los campos
   const validate = () => {
     const newErrors = {};
-
     if (!form.codigo_arete.trim()) newErrors.codigo_arete = "El código de arete es obligatorio";
     if (!form.sexo) newErrors.sexo = "El sexo es obligatorio";
     if (!form.peso_actual || Number(form.peso_actual) <= 0)
       newErrors.peso_actual = "El peso debe ser mayor a 0";
     if (!form.fecha_nacimiento)
       newErrors.fecha_nacimiento = "La fecha de nacimiento es obligatoria";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Envía el formulario
   const handleSubmit = (event) => {
     event.preventDefault();
-
     if (!validate()) return;
 
-    // Enviar al backend con UUIDs fijos (temporal)
     onAddPig({
       codigo_arete: form.codigo_arete.trim(),
       sexo: form.sexo,
@@ -55,7 +44,6 @@ function PigForm({ onAddPig }) {
       raza_id: "d0fb3d79-c997-46fc-8749-e64a63755f13",
     });
 
-    // Reinicia el formulario
     setForm({
       codigo_arete: "",
       sexo: "M",
@@ -67,88 +55,76 @@ function PigForm({ onAddPig }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Código de Arete</label>
+        <label className="form-label">
+          Código de Arete <span className="required">*</span>
+        </label>
         <input
-          id="codigo_arete"
           name="codigo_arete"
           type="text"
           value={form.codigo_arete}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          className="input-modern"
           placeholder="Ej: A001"
         />
-        {errors.codigo_arete && <span className="text-xs text-red-600 mt-1">{errors.codigo_arete}</span>}
+        {errors.codigo_arete && <span className="text-xs text-red-500 mt-1 block">{errors.codigo_arete}</span>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Sexo</label>
-        <select
-          id="sexo"
-          name="sexo"
-          value={form.sexo}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
-        >
+        <label className="form-label">
+          Sexo <span className="required">*</span>
+        </label>
+        <select name="sexo" value={form.sexo} onChange={handleChange} className="input-modern">
           <option value="M">Macho</option>
           <option value="F">Hembra</option>
         </select>
-        {errors.sexo && <span className="text-xs text-red-600 mt-1">{errors.sexo}</span>}
+        {errors.sexo && <span className="text-xs text-red-500 mt-1 block">{errors.sexo}</span>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Peso actual (kg)</label>
+        <label className="form-label">
+          Peso actual (kg) <span className="required">*</span>
+        </label>
         <input
-          id="peso_actual"
           name="peso_actual"
           type="number"
           step="0.1"
           value={form.peso_actual}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          className="input-modern"
           placeholder="Ej: 45.5"
         />
-        {errors.peso_actual && <span className="text-xs text-red-600 mt-1">{errors.peso_actual}</span>}
+        {errors.peso_actual && <span className="text-xs text-red-500 mt-1 block">{errors.peso_actual}</span>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de nacimiento</label>
+        <label className="form-label">
+          Fecha de nacimiento <span className="required">*</span>
+        </label>
         <input
-          id="fecha_nacimiento"
           name="fecha_nacimiento"
           type="date"
           value={form.fecha_nacimiento}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          className="input-modern"
         />
-        {errors.fecha_nacimiento && (
-          <span className="text-xs text-red-600 mt-1">{errors.fecha_nacimiento}</span>
-        )}
+        {errors.fecha_nacimiento && <span className="text-xs text-red-500 mt-1 block">{errors.fecha_nacimiento}</span>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-        <select
-          id="estado"
-          name="estado"
-          value={form.estado}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
-        >
+        <label className="form-label">Estado</label>
+        <select name="estado" value={form.estado} onChange={handleChange} className="input-modern">
           <option value="ACTIVO">Activo</option>
           <option value="INACTIVO">Inactivo</option>
         </select>
       </div>
 
       <div className="flex items-end">
-        <button 
-          type="submit" 
-          className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-        >
-          <i className="fas fa-plus mr-2"></i>
-          Registrar Cerdo
+        <button type="submit" className="btn-primary w-full">
+          <i className="fas fa-plus"></i>
+          Registrar
         </button>
       </div>
     </form>

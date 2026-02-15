@@ -11,55 +11,27 @@ export default function Nutricion() {
   const [showConsumoForm, setShowConsumoForm] = useState(false);
 
   const [alimentoData, setAlimentoData] = useState({
-    nombre_alimento: "",
-    tipo: "CRECIMIENTO",
-    proteina_porcentaje: "",
-    costo_por_kg: "",
-    proveedor: "",
-    stock_kg: "",
-    observaciones: ""
+    nombre_alimento: "", tipo: "CRECIMIENTO", proteina_porcentaje: "",
+    costo_por_kg: "", proveedor: "", stock_kg: "", observaciones: ""
   });
 
   const [consumoData, setConsumoData] = useState({
-    pig_id: "",
-    alimento_id: "",
-    fecha: "",
-    cantidad_kg: "",
-    lote: "",
-    observaciones: ""
+    pig_id: "", alimento_id: "", fecha: "", cantidad_kg: "", lote: "", observaciones: ""
   });
 
-  useEffect(() => {
-    fetchAlimentos();
-    fetchConsumos();
-    fetchPigs();
-  }, []);
+  useEffect(() => { fetchAlimentos(); fetchConsumos(); fetchPigs(); }, []);
 
   const fetchAlimentos = async () => {
-    try {
-      const data = await apiGet("/nutricion/alimentos");
-      setAlimentos(data);
-    } catch (error) {
-      console.error("Error al cargar alimentos:", error);
-    }
+    try { const data = await apiGet("/nutricion/alimentos"); setAlimentos(data); }
+    catch (error) { console.error("Error al cargar alimentos:", error); }
   };
-
   const fetchConsumos = async () => {
-    try {
-      const data = await apiGet("/nutricion/consumos");
-      setConsumos(data);
-    } catch (error) {
-      console.error("Error al cargar consumos:", error);
-    }
+    try { const data = await apiGet("/nutricion/consumos"); setConsumos(data); }
+    catch (error) { console.error("Error al cargar consumos:", error); }
   };
-
   const fetchPigs = async () => {
-    try {
-      const data = await apiGet("/pigs");
-      setPigs(data);
-    } catch (error) {
-      console.error("Error al cargar cerdos:", error);
-    }
+    try { const data = await apiGet("/pigs"); setPigs(data); }
+    catch (error) { console.error("Error al cargar cerdos:", error); }
   };
 
   const handleAlimentoSubmit = async (e) => {
@@ -67,21 +39,9 @@ export default function Nutricion() {
     try {
       await apiPost("/nutricion/alimentos", alimentoData);
       toast.success("Alimento creado exitosamente");
-      setShowAlimentoForm(false);
-      fetchAlimentos();
-      setAlimentoData({
-        nombre_alimento: "",
-        tipo: "CRECIMIENTO",
-        proteina_porcentaje: "",
-        costo_por_kg: "",
-        proveedor: "",
-        stock_kg: "",
-        observaciones: ""
-      });
-    } catch (error) {
-      console.error("Error al crear alimento:", error);
-      toast.error(error.message || "Error de conexión");
-    }
+      setShowAlimentoForm(false); fetchAlimentos();
+      setAlimentoData({ nombre_alimento: "", tipo: "CRECIMIENTO", proteina_porcentaje: "", costo_por_kg: "", proveedor: "", stock_kg: "", observaciones: "" });
+    } catch (error) { toast.error(error.message || "Error de conexión"); }
   };
 
   const handleConsumoSubmit = async (e) => {
@@ -89,112 +49,83 @@ export default function Nutricion() {
     try {
       await apiPost("/nutricion/consumos", consumoData);
       toast.success("Consumo registrado exitosamente");
-      setShowConsumoForm(false);
-      fetchConsumos();
-      fetchAlimentos();
-      setConsumoData({
-        pig_id: "",
-        alimento_id: "",
-        fecha: "",
-        cantidad_kg: "",
-        lote: "",
-        observaciones: ""
-      });
-    } catch (error) {
-      console.error("Error al registrar consumo:", error);
-      toast.error(error.message || "Error de conexión", {
-        duration: 5000,
-        style: { border: '1px solid #EF4444', color: '#B91C1C' }
-      });
-    }
+      setShowConsumoForm(false); fetchConsumos(); fetchAlimentos();
+      setConsumoData({ pig_id: "", alimento_id: "", fecha: "", cantidad_kg: "", lote: "", observaciones: "" });
+    } catch (error) { toast.error(error.message || "Error de conexión"); }
   };
 
   const handleDeleteAlimento = async (id) => {
     if (window.confirm("¿Eliminar este alimento?")) {
-      try {
-        await apiDelete(`/nutricion/alimentos/${id}`);
-        toast.success("Alimento eliminado");
-        fetchAlimentos();
-      } catch (error) {
-        console.error("Error al eliminar:", error);
-        toast.error(error.message || "Error de conexión");
-      }
+      try { await apiDelete(`/nutricion/alimentos/${id}`); toast.success("Alimento eliminado"); fetchAlimentos(); }
+      catch (error) { toast.error(error.message || "Error de conexión"); }
     }
   };
 
   const getTipoBadge = (tipo) => {
-    const colors = {
-      INICIADOR: "bg-purple-100 text-purple-800",
-      CRECIMIENTO: "bg-blue-100 text-blue-800",
-      ENGORDE: "bg-green-100 text-green-800",
-      GESTACION: "bg-pink-100 text-pink-800",
-      LACTANCIA: "bg-yellow-100 text-yellow-800"
+    const styles = {
+      INICIADOR: "bg-purple-50 text-purple-700 border-purple-100",
+      CRECIMIENTO: "bg-blue-50 text-blue-700 border-blue-100",
+      ENGORDE: "bg-emerald-50 text-emerald-700 border-emerald-100",
+      GESTACION: "bg-pink-50 text-pink-700 border-pink-100",
+      LACTANCIA: "bg-amber-50 text-amber-700 border-amber-100"
     };
-    return colors[tipo] || "bg-gray-100 text-gray-800";
+    return styles[tipo] || "bg-gray-50 text-gray-700 border-gray-100";
   };
 
+  const tabs = [
+    { id: "alimentos", label: "Catálogo de Alimentos", icon: "fa-wheat-awn" },
+    { id: "consumos", label: "Registro de Consumo", icon: "fa-utensils" },
+  ];
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">
-          <i className="fas fa-apple-whole mr-2"></i>Nutrición
-        </h2>
+    <div className="space-y-5 animate-fadeIn">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <i className="fas fa-apple-whole text-green-500"></i>Nutrición
+          </h2>
+          <p className="text-sm text-gray-400 mt-0.5">{alimentos.length} alimentos · {consumos.length} consumos</p>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab("alimentos")}
-          className={`pb-2 px-4 font-semibold ${activeTab === "alimentos"
-            ? "border-b-2 border-green-600 text-green-600"
-            : "text-gray-600"
-            }`}
-        >
-          Catálogo de Alimentos
-        </button>
-        <button
-          onClick={() => setActiveTab("consumos")}
-          className={`pb-2 px-4 font-semibold ${activeTab === "consumos"
-            ? "border-b-2 border-green-600 text-green-600"
-            : "text-gray-600"
-            }`}
-        >
-          Registro de Consumo
-        </button>
+      {/* Tabs modernos */}
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${activeTab === tab.id
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+              }`}
+          >
+            <i className={`fas ${tab.icon} text-xs`}></i>{tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Tab: Alimentos */}
       {activeTab === "alimentos" && (
-        <div>
-          <button
-            onClick={() => setShowAlimentoForm(!showAlimentoForm)}
-            className="mb-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-          >
-            <i className="fas fa-plus mr-2"></i>Nuevo Alimento
+        <div className="space-y-4 animate-fadeIn">
+          <button onClick={() => setShowAlimentoForm(!showAlimentoForm)} className="btn-primary">
+            <i className={`fas ${showAlimentoForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showAlimentoForm ? "Cerrar" : "Nuevo Alimento"}
           </button>
 
           {showAlimentoForm && (
-            <form onSubmit={handleAlimentoSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <h3 className="text-xl font-bold mb-4">Nuevo Alimento</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleAlimentoSubmit} className="glass-card p-6 animate-scaleIn">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i className="fas fa-wheat-awn text-green-500"></i>Nuevo Alimento
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Nombre Alimento</label>
-                  <input
-                    type="text"
-                    value={alimentoData.nombre_alimento}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, nombre_alimento: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  />
+                  <label className="form-label">Nombre <span className="required">*</span></label>
+                  <input type="text" value={alimentoData.nombre_alimento} onChange={(e) => setAlimentoData({ ...alimentoData, nombre_alimento: e.target.value })} className="input-modern" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Tipo</label>
-                  <select
-                    value={alimentoData.tipo}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, tipo: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  >
+                  <label className="form-label">Tipo <span className="required">*</span></label>
+                  <select value={alimentoData.tipo} onChange={(e) => setAlimentoData({ ...alimentoData, tipo: e.target.value })} className="input-modern" required>
                     <option value="INICIADOR">Iniciador</option>
                     <option value="CRECIMIENTO">Crecimiento</option>
                     <option value="ENGORDE">Engorde</option>
@@ -203,245 +134,143 @@ export default function Nutricion() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Proteína (%)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={alimentoData.proteina_porcentaje}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, proteina_porcentaje: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Proteína (%)</label>
+                  <input type="number" step="0.01" value={alimentoData.proteina_porcentaje} onChange={(e) => setAlimentoData({ ...alimentoData, proteina_porcentaje: e.target.value })} className="input-modern" min="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Costo por kg</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={alimentoData.costo_por_kg}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, costo_por_kg: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Costo por kg</label>
+                  <input type="number" step="0.01" value={alimentoData.costo_por_kg} onChange={(e) => setAlimentoData({ ...alimentoData, costo_por_kg: e.target.value })} className="input-modern" min="0" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Proveedor</label>
-                  <input
-                    type="text"
-                    value={alimentoData.proveedor}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, proveedor: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
+                  <label className="form-label">Proveedor</label>
+                  <input type="text" value={alimentoData.proveedor} onChange={(e) => setAlimentoData({ ...alimentoData, proveedor: e.target.value })} className="input-modern" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Stock (kg)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={alimentoData.stock_kg}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, stock_kg: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    min="0"
-                  />
+                  <label className="form-label">Stock (kg)</label>
+                  <input type="number" step="0.01" value={alimentoData.stock_kg} onChange={(e) => setAlimentoData({ ...alimentoData, stock_kg: e.target.value })} className="input-modern" min="0" />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold mb-1">Observaciones</label>
-                  <textarea
-                    value={alimentoData.observaciones}
-                    onChange={(e) => setAlimentoData({ ...alimentoData, observaciones: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    rows="2"
-                  />
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label className="form-label">Observaciones</label>
+                  <textarea value={alimentoData.observaciones} onChange={(e) => setAlimentoData({ ...alimentoData, observaciones: e.target.value })} className="input-modern" rows="2" />
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAlimentoForm(false)}
-                  className="bg-gray-300 px-6 py-2 rounded-lg"
-                >
-                  Cancelar
-                </button>
+              <div className="flex gap-2 mt-5">
+                <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar</button>
+                <button type="button" onClick={() => setShowAlimentoForm(false)} className="btn-secondary">Cancelar</button>
               </div>
             </form>
           )}
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-green-600 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left">Nombre</th>
-                  <th className="px-4 py-3 text-left">Tipo</th>
-                  <th className="px-4 py-3 text-center">Proteína (%)</th>
-                  <th className="px-4 py-3 text-center">Costo/kg</th>
-                  <th className="px-4 py-3 text-left">Proveedor</th>
-                  <th className="px-4 py-3 text-center">Stock (kg)</th>
-                  <th className="px-4 py-3 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {alimentos.map((alimento) => (
-                  <tr key={alimento.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-semibold">{alimento.nombre_alimento}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${getTipoBadge(alimento.tipo)}`}>
-                        {alimento.tipo}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">{alimento.proteina_porcentaje || "-"}</td>
-                    <td className="px-4 py-3 text-center">
-                      {alimento.costo_por_kg ? `$${parseFloat(alimento.costo_por_kg).toFixed(2)}` : "-"}
-                    </td>
-                    <td className="px-4 py-3">{alimento.proveedor || "-"}</td>
-                    <td className="px-4 py-3 text-center font-bold text-blue-600">
-                      {parseFloat(alimento.stock_kg).toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => handleDeleteAlimento(alimento.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="glass-card overflow-hidden">
+            {alimentos.length === 0 ? (
+              <div className="empty-state"><i className="fas fa-wheat-awn"></i><p>No hay alimentos registrados.</p></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th><th>Tipo</th><th>Proteína</th><th>Costo/kg</th><th>Proveedor</th><th>Stock</th><th className="text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {alimentos.map((a) => (
+                      <tr key={a.id}>
+                        <td className="font-semibold text-gray-900">{a.nombre_alimento}</td>
+                        <td><span className={`badge border ${getTipoBadge(a.tipo)}`}>{a.tipo}</span></td>
+                        <td>{a.proteina_porcentaje || "—"}</td>
+                        <td>{a.costo_por_kg ? `$${parseFloat(a.costo_por_kg).toFixed(2)}` : "—"}</td>
+                        <td>{a.proveedor || "—"}</td>
+                        <td><span className="font-bold text-blue-600">{parseFloat(a.stock_kg).toFixed(1)} kg</span></td>
+                        <td className="text-center">
+                          <button onClick={() => handleDeleteAlimento(a.id)} className="btn-danger"><i className="fas fa-trash text-xs"></i></button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Tab: Consumos */}
       {activeTab === "consumos" && (
-        <div>
-          <button
-            onClick={() => setShowConsumoForm(!showConsumoForm)}
-            className="mb-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-          >
-            <i className="fas fa-plus mr-2"></i>Registrar Consumo
+        <div className="space-y-4 animate-fadeIn">
+          <button onClick={() => setShowConsumoForm(!showConsumoForm)} className="btn-primary">
+            <i className={`fas ${showConsumoForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showConsumoForm ? "Cerrar" : "Registrar Consumo"}
           </button>
 
           {showConsumoForm && (
-            <form onSubmit={handleConsumoSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <h3 className="text-xl font-bold mb-4">Registrar Consumo</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleConsumoSubmit} className="glass-card p-6 animate-scaleIn">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i className="fas fa-utensils text-green-500"></i>Registrar Consumo
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Cerdo</label>
-                  <select
-                    value={consumoData.pig_id}
-                    onChange={(e) => setConsumoData({ ...consumoData, pig_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  >
+                  <label className="form-label">Cerdo <span className="required">*</span></label>
+                  <select value={consumoData.pig_id} onChange={(e) => setConsumoData({ ...consumoData, pig_id: e.target.value })} className="input-modern" required>
                     <option value="">Seleccione...</option>
-                    {pigs.map((pig) => (
-                      <option key={pig.id} value={pig.id}>
-                        {pig.codigo_arete} - {pig.sexo}
-                      </option>
-                    ))}
+                    {pigs.map((pig) => <option key={pig.id} value={pig.id}>{pig.codigo_arete} - {pig.sexo}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Alimento</label>
-                  <select
-                    value={consumoData.alimento_id}
-                    onChange={(e) => setConsumoData({ ...consumoData, alimento_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  >
+                  <label className="form-label">Alimento <span className="required">*</span></label>
+                  <select value={consumoData.alimento_id} onChange={(e) => setConsumoData({ ...consumoData, alimento_id: e.target.value })} className="input-modern" required>
                     <option value="">Seleccione...</option>
-                    {alimentos.map((alimento) => (
-                      <option key={alimento.id} value={alimento.id}>
-                        {alimento.nombre_alimento} ({alimento.tipo})
-                      </option>
-                    ))}
+                    {alimentos.map((a) => <option key={a.id} value={a.id}>{a.nombre_alimento} ({a.tipo})</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Fecha</label>
-                  <input
-                    type="date"
-                    value={consumoData.fecha}
-                    onChange={(e) => setConsumoData({ ...consumoData, fecha: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                  />
+                  <label className="form-label">Fecha <span className="required">*</span></label>
+                  <input type="date" value={consumoData.fecha} onChange={(e) => setConsumoData({ ...consumoData, fecha: e.target.value })} className="input-modern" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Cantidad (kg)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={consumoData.cantidad_kg}
-                    onChange={(e) => setConsumoData({ ...consumoData, cantidad_kg: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    required
-                    min="0.1"
-                  />
+                  <label className="form-label">Cantidad (kg) <span className="required">*</span></label>
+                  <input type="number" step="0.01" value={consumoData.cantidad_kg} onChange={(e) => setConsumoData({ ...consumoData, cantidad_kg: e.target.value })} className="input-modern" required min="0.1" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Lote</label>
-                  <input
-                    type="text"
-                    value={consumoData.lote}
-                    onChange={(e) => setConsumoData({ ...consumoData, lote: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
+                  <label className="form-label">Lote</label>
+                  <input type="text" value={consumoData.lote} onChange={(e) => setConsumoData({ ...consumoData, lote: e.target.value })} className="input-modern" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Observaciones</label>
-                  <input
-                    type="text"
-                    value={consumoData.observaciones}
-                    onChange={(e) => setConsumoData({ ...consumoData, observaciones: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  />
+                  <label className="form-label">Observaciones</label>
+                  <input type="text" value={consumoData.observaciones} onChange={(e) => setConsumoData({ ...consumoData, observaciones: e.target.value })} className="input-modern" />
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowConsumoForm(false)}
-                  className="bg-gray-300 px-6 py-2 rounded-lg"
-                >
-                  Cancelar
-                </button>
+              <div className="flex gap-2 mt-5">
+                <button type="submit" className="btn-primary"><i className="fas fa-save"></i>Guardar</button>
+                <button type="button" onClick={() => setShowConsumoForm(false)} className="btn-secondary">Cancelar</button>
               </div>
             </form>
           )}
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-green-600 text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left">Cerdo</th>
-                  <th className="px-4 py-3 text-left">Alimento</th>
-                  <th className="px-4 py-3 text-left">Fecha</th>
-                  <th className="px-4 py-3 text-center">Cantidad (kg)</th>
-                  <th className="px-4 py-3 text-left">Lote</th>
-                </tr>
-              </thead>
-              <tbody>
-                {consumos.map((consumo) => (
-                  <tr key={consumo.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-semibold">{consumo.codigo_arete}</td>
-                    <td className="px-4 py-3">{consumo.nombre_alimento}</td>
-                    <td className="px-4 py-3">{new Date(consumo.fecha).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 text-center font-bold text-green-600">
-                      {parseFloat(consumo.cantidad_kg).toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">{consumo.lote || "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="glass-card overflow-hidden">
+            {consumos.length === 0 ? (
+              <div className="empty-state"><i className="fas fa-utensils"></i><p>No hay consumos registrados.</p></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Cerdo</th><th>Alimento</th><th>Fecha</th><th>Cantidad</th><th>Lote</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consumos.map((c) => (
+                      <tr key={c.id}>
+                        <td className="font-semibold text-gray-900">{c.codigo_arete}</td>
+                        <td>{c.nombre_alimento}</td>
+                        <td>{new Date(c.fecha).toLocaleDateString()}</td>
+                        <td><span className="font-bold text-emerald-600">{parseFloat(c.cantidad_kg).toFixed(2)} kg</span></td>
+                        <td>{c.lote || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
