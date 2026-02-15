@@ -1,134 +1,81 @@
-// src/components/PigForm.jsx — Formulario moderno para registrar cerdos
+// src/components/PigForm.jsx — Formulario de cerdo Premium
 import { useState } from "react";
 
-function PigForm({ onAddPig }) {
-  const [form, setForm] = useState({
-    codigo_arete: "",
-    sexo: "M",
-    peso_actual: "",
-    fecha_nacimiento: "",
-    estado: "ACTIVO",
+export default function PigForm({ onAddPig, initialData }) {
+  const [formData, setFormData] = useState(initialData || {
+    codigo_arete: "", nombre: "", raza: "", sexo: "M",
+    fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO",
+    ubicacion: "", observaciones: ""
   });
 
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAddPig(formData);
+    if (!initialData) {
+      setFormData({ codigo_arete: "", nombre: "", raza: "", sexo: "M", fecha_nacimiento: "", peso_actual: "", estado: "ACTIVO", ubicacion: "", observaciones: "" });
+    }
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!form.codigo_arete.trim()) newErrors.codigo_arete = "El código de arete es obligatorio";
-    if (!form.sexo) newErrors.sexo = "El sexo es obligatorio";
-    if (!form.peso_actual || Number(form.peso_actual) <= 0)
-      newErrors.peso_actual = "El peso debe ser mayor a 0";
-    if (!form.fecha_nacimiento)
-      newErrors.fecha_nacimiento = "La fecha de nacimiento es obligatoria";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (!validate()) return;
-
-    onAddPig({
-      codigo_arete: form.codigo_arete.trim(),
-      sexo: form.sexo,
-      peso_actual: Number(form.peso_actual),
-      fecha_nacimiento: form.fecha_nacimiento,
-      estado: form.estado,
-      lote_id: "8d6c2f0a-3b17-4b2a-9c8e-1f2a3d4e5b6c",
-      etapa_id: "b2c3d4e5-2222-3333-4444-555566667777",
-      raza_id: "d0fb3d79-c997-46fc-8749-e64a63755f13",
-    });
-
-    setForm({
-      codigo_arete: "",
-      sexo: "M",
-      peso_actual: "",
-      fecha_nacimiento: "",
-      estado: "ACTIVO",
-    });
-    setErrors({});
-  };
+  const inputClass = "w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all";
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-      <div>
-        <label className="form-label">
-          Código de Arete <span className="required">*</span>
-        </label>
-        <input
-          name="codigo_arete"
-          type="text"
-          value={form.codigo_arete}
-          onChange={handleChange}
-          className="input-modern"
-          placeholder="Ej: A001"
-        />
-        {errors.codigo_arete && <span className="text-xs text-red-500 mt-1 block">{errors.codigo_arete}</span>}
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            Código Arete <span className="text-red-500">*</span>
+          </label>
+          <input type="text" value={formData.codigo_arete} onChange={(e) => setFormData({ ...formData, codigo_arete: e.target.value })} className={inputClass} placeholder="Ej: A001" required />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre</label>
+          <input type="text" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} className={inputClass} placeholder="Nombre del cerdo" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Raza <span className="text-red-500">*</span></label>
+          <select value={formData.raza} onChange={(e) => setFormData({ ...formData, raza: e.target.value })} className={inputClass} required>
+            <option value="">Seleccione raza...</option>
+            <option value="Landrace">Landrace</option>
+            <option value="Yorkshire">Yorkshire</option>
+            <option value="Duroc">Duroc</option>
+            <option value="Pietrain">Pietrain</option>
+            <option value="Hampshire">Hampshire</option>
+            <option value="Berkshire">Berkshire</option>
+            <option value="Criollo">Criollo</option>
+            <option value="Mestizo">Mestizo</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Sexo <span className="text-red-500">*</span></label>
+          <select value={formData.sexo} onChange={(e) => setFormData({ ...formData, sexo: e.target.value })} className={inputClass} required>
+            <option value="M">Macho</option>
+            <option value="H">Hembra</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha Nacimiento</label>
+          <input type="date" value={formData.fecha_nacimiento} onChange={(e) => setFormData({ ...formData, fecha_nacimiento: e.target.value })} className={inputClass} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Peso Actual (kg)</label>
+          <input type="number" step="0.01" min="0" value={formData.peso_actual} onChange={(e) => setFormData({ ...formData, peso_actual: e.target.value })} className={inputClass} placeholder="0.00" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Ubicación</label>
+          <input type="text" value={formData.ubicacion} onChange={(e) => setFormData({ ...formData, ubicacion: e.target.value })} className={inputClass} placeholder="Corral, galpón..." />
+        </div>
+        <div className="lg:col-span-2">
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Observaciones</label>
+          <textarea value={formData.observaciones} onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })} className={inputClass} rows="2" placeholder="Notas adicionales..." />
+        </div>
       </div>
-
-      <div>
-        <label className="form-label">
-          Sexo <span className="required">*</span>
-        </label>
-        <select name="sexo" value={form.sexo} onChange={handleChange} className="input-modern">
-          <option value="M">Macho</option>
-          <option value="F">Hembra</option>
-        </select>
-        {errors.sexo && <span className="text-xs text-red-500 mt-1 block">{errors.sexo}</span>}
-      </div>
-
-      <div>
-        <label className="form-label">
-          Peso actual (kg) <span className="required">*</span>
-        </label>
-        <input
-          name="peso_actual"
-          type="number"
-          step="0.1"
-          value={form.peso_actual}
-          onChange={handleChange}
-          className="input-modern"
-          placeholder="Ej: 45.5"
-        />
-        {errors.peso_actual && <span className="text-xs text-red-500 mt-1 block">{errors.peso_actual}</span>}
-      </div>
-
-      <div>
-        <label className="form-label">
-          Fecha de nacimiento <span className="required">*</span>
-        </label>
-        <input
-          name="fecha_nacimiento"
-          type="date"
-          value={form.fecha_nacimiento}
-          onChange={handleChange}
-          className="input-modern"
-        />
-        {errors.fecha_nacimiento && <span className="text-xs text-red-500 mt-1 block">{errors.fecha_nacimiento}</span>}
-      </div>
-
-      <div>
-        <label className="form-label">Estado</label>
-        <select name="estado" value={form.estado} onChange={handleChange} className="input-modern">
-          <option value="ACTIVO">Activo</option>
-          <option value="INACTIVO">Inactivo</option>
-        </select>
-      </div>
-
-      <div className="flex items-end">
-        <button type="submit" className="btn-primary w-full">
-          <i className="fas fa-plus"></i>
-          Registrar
+      <div className="mt-6 pt-5 border-t border-gray-100">
+        <button type="submit"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-105 transition-all duration-300">
+          <i className="fas fa-save"></i>
+          {initialData ? "Actualizar Cerdo" : "Registrar Cerdo"}
         </button>
       </div>
     </form>
   );
 }
-
-export default PigForm;

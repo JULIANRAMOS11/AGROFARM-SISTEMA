@@ -1,174 +1,123 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { login as apiLogin } from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
+import { login } from "../services/api";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
-    if (username.trim() === "" || password.trim() === "") {
-      setError("Debe ingresar usuario y contraseña.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await apiLogin({ username: username.trim(), password: password.trim() });
-      nav("/dashboard");
-    } catch (e2) {
-      setError(e2.message || "No se pudo conectar con la API.");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    try { await login({ username, password }); toast.success("Bienvenido a AGROFARM"); navigate("/dashboard"); }
+    catch (err) { toast.error(err.message || "Error al iniciar sesión"); }
+    finally { setLoading(false); }
   };
 
-  const disabled = loading || username.trim() === "" || password.trim() === "";
-
   return (
-    <div className="min-h-screen flex bg-white overflow-hidden">
-      {/* Sección Izquierda - Decorativa con overlay premium */}
-      <div className="hidden md:flex md:w-1/2 lg:w-3/5 relative items-center justify-center overflow-hidden">
-        <img
-          src="/cerdos.webp"
-          className="absolute inset-0 w-full h-full object-cover"
-          alt="Granja Fondo"
-        />
-        {/* Overlay con gradiente premium */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-green-800/80 to-emerald-900/90"></div>
+    <div className="min-h-screen flex bg-gray-50">
 
-        {/* Decoraciones flotantes */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-green-500/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-32 right-16 w-40 h-40 bg-emerald-400/15 rounded-full blur-3xl animate-float delay-300"></div>
-        <div className="absolute top-1/2 left-10 w-24 h-24 bg-green-300/10 rounded-full blur-2xl animate-float delay-500"></div>
+      {/* ── Left panel — Brand ── */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 relative overflow-hidden">
+        {/* Pattern overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.06%22%3E%3Cpath d=%22M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
 
-        <div className="relative z-10 text-center px-10 animate-fadeIn">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-green-200 text-sm font-medium mb-8">
-            <i className="fas fa-leaf"></i>
-            Sistema de Gestión Porcina
+        {/* Decorative circles */}
+        <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-white/5"></div>
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-white/5"></div>
+        <div className="absolute top-1/3 right-12 w-40 h-40 rounded-full bg-white/5"></div>
+
+        <div className="relative z-10 flex flex-col justify-center px-16">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shadow-xl">
+              <i className="fas fa-leaf text-white text-2xl"></i>
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight">AGROFARM</h1>
+              <p className="text-emerald-200 text-sm font-medium">Sistema de Gestión Porcina</p>
+            </div>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-            Gestión Inteligente<br />para tu Granja
-          </h2>
-          <p className="text-green-100/80 text-lg max-w-md mx-auto leading-relaxed">
-            Controla la producción, sanidad y reproducción de tu ganado porcino en un solo lugar.
+
+          <p className="text-xl text-white/90 font-medium leading-relaxed mb-10 max-w-md">
+            Controla tu granja de manera inteligente. Gestión de cerdos, sanidad, reproducción, nutrición y producción en un solo lugar.
           </p>
 
-          {/* Stats decorativos */}
-          <div className="flex justify-center gap-8 mt-10">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-white">100%</p>
-              <p className="text-green-200/70 text-sm">Digital</p>
-            </div>
-            <div className="w-px bg-white/20"></div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-white">24/7</p>
-              <p className="text-green-200/70 text-sm">Acceso</p>
-            </div>
-            <div className="w-px bg-white/20"></div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-white">∞</p>
-              <p className="text-green-200/70 text-sm">Registros</p>
-            </div>
+          <div className="space-y-5">
+            {[
+              { icon: "fa-chart-pie", title: "Dashboard Inteligente", desc: "Estadísticas en tiempo real" },
+              { icon: "fa-heart-pulse", title: "Control Sanitario", desc: "Vacunas y tratamientos al día" },
+              { icon: "fa-dna", title: "Reproducción", desc: "Seguimiento completo de ciclos" }
+            ].map(f => (
+              <div key={f.title} className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+                  <i className={`fas ${f.icon} text-white text-sm`}></i>
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{f.title}</p>
+                  <p className="text-emerald-200/70 text-xs">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Sección Derecha - Formulario */}
-      <div className="w-full md:w-1/2 lg:w-2/5 flex flex-col justify-center items-center p-8 lg:p-16 relative overflow-y-auto">
-        {/* Decoración de fondo */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-
-        <div className="w-full max-w-md relative z-10 animate-slideUp">
-
-          {/* Logo + Header */}
-          <div className="text-center mb-8">
-            <img
-              src="/logo2.png"
-              alt="Logo Agrofarm"
-              className="mx-auto h-32 md:h-36 w-auto max-w-full object-contain mb-5 drop-shadow-xl"
-            />
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Bienvenido</h1>
-            <p className="text-gray-400 mt-1.5 text-sm">Accede a tu panel de control</p>
-          </div>
-
-          {/* Separador */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100"></div>
+      {/* ── Right panel — Form ── */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+              <i className="fas fa-leaf text-white text-xl"></i>
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-white text-gray-400 font-medium">Ingresa con tu usuario</span>
+            <div>
+              <h1 className="text-2xl font-extrabold text-slate-800">AGROFARM</h1>
+              <p className="text-xs text-gray-400 font-medium">Gestión Porcina</p>
             </div>
           </div>
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="form-label">
-                <i className="fas fa-user text-green-500 mr-1.5 text-xs"></i>Usuario
-              </label>
-              <input
-                type="text"
-                name="username"
-                placeholder="Nombre de usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input-modern"
-              />
-            </div>
+          <div>
+            <h2 className="text-2xl font-extrabold text-slate-800">Iniciar Sesión</h2>
+            <p className="text-gray-500 mt-1 mb-8">Ingresa tus credenciales para continuar</p>
+          </div>
 
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="form-label">
-                <i className="fas fa-lock text-green-500 mr-1.5 text-xs"></i>Contraseña
-              </label>
-              <input
-                placeholder="••••••••"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input-modern"
-              />
-            </div>
-
-            {error && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-scaleIn">
-                <i className="fas fa-exclamation-circle text-red-500 text-sm"></i>
-                <p className="text-sm text-red-600">{error}</p>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Usuario</label>
+              <div className="relative">
+                <i className="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Tu nombre de usuario"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
+                  required />
               </div>
-            )}
+            </div>
 
-            <button
-              type="submit"
-              disabled={disabled}
-              className="btn-primary w-full py-3 text-base mt-2"
-            >
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Contraseña</label>
+              <div className="relative">
+                <i className="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
+                  required />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all duration-300 disabled:opacity-60 disabled:hover:scale-100">
               {loading ? (
-                <>
-                  <i className="fas fa-spinner fa-spin"></i>
-                  Ingresando...
-                </>
+                <span className="inline-flex items-center gap-2"><i className="fas fa-spinner fa-spin"></i>Ingresando...</span>
               ) : (
-                <>
-                  <i className="fas fa-arrow-right"></i>
-                  Iniciar Sesión
-                </>
+                <span className="inline-flex items-center gap-2"><i className="fas fa-right-to-bracket"></i>Iniciar Sesión</span>
               )}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-400 mt-6">
+          <p className="text-center mt-8 text-sm text-gray-500">
             ¿No tienes cuenta?{" "}
-            <Link to="/register" className="text-green-600 hover:text-green-700 font-semibold transition-colors">
-              Regístrate aquí
-            </Link>
+            <Link to="/register" className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors">Crear cuenta</Link>
           </p>
         </div>
       </div>
