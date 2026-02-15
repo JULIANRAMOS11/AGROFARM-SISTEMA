@@ -1,0 +1,122 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║  🎯 INSTRUCCIONES RÁPIDAS - CARGAR DATOS PROFESIONALES             ║
+║                                                                    ║
+║  Tiempo estimado: 5 minutos                                       ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+
+📌 PASO 1: ABRIR SUPABASE
+─────────────────────────────────────────────────────────────────────
+1. Ve a: https://supabase.com/dashboard
+2. Inicia sesión
+3. Selecciona tu proyecto "AGROFARM"
+4. Haz clic en "SQL Editor" (ícono 🗄️ en el menú lateral)
+
+
+📌 PASO 2: COPIAR EL SCRIPT
+─────────────────────────────────────────────────────────────────────
+1. Abre: backend-api\database\DATOS_PROFESIONALES_COMPLETOS.sql
+2. Selecciona TODO el contenido (Ctrl+A)
+3. Copia (Ctrl+C)
+
+
+📌 PASO 3: EJECUTAR EN SUPABASE
+─────────────────────────────────────────────────────────────────────
+1. En Supabase SQL Editor, pega el contenido (Ctrl+V)
+2. Haz clic en el botón "RUN" (▶️) abajo a la derecha
+3. Espera 10-15 segundos hasta que aparezca "Success"
+
+
+📌 PASO 4: VERIFICAR (OPCIONAL)
+─────────────────────────────────────────────────────────────────────
+Ejecuta esta consulta para verificar:
+
+    SELECT 
+      'Cerdos' as tabla, COUNT(*) as total FROM pigs
+    UNION ALL
+    SELECT 'Alimentos', COUNT(*) FROM alimentos
+    UNION ALL
+    SELECT 'Consumos', COUNT(*) FROM consumos
+    UNION ALL
+    SELECT 'Sanidad', COUNT(*) FROM sanidad
+    UNION ALL
+    SELECT 'Producción', COUNT(*) FROM produccion
+    UNION ALL
+    SELECT 'Reproducción', COUNT(*) FROM reproduccion;
+
+Deberías ver:
+✅ Cerdos: 23
+✅ Alimentos: 13
+✅ Consumos: 30+
+✅ Sanidad: 25+
+✅ Producción: 20+
+✅ Reproducción: 13
+
+
+📌 PASO 5: REFRESCAR LA APLICACIÓN
+─────────────────────────────────────────────────────────────────────
+1. CIERRA SESIÓN en tu aplicación web
+2. VUELVE A INICIAR SESIÓN con:
+   Usuario: julian
+   Contraseña: 12345
+3. Ve a "Mi Perfil" → Verás: Dr. Julián Ramos García - Veterinario
+4. Explora cada módulo:
+   🐷 Cerdos      → 23 animales organizados
+   🍽️ Nutrición   → 13 alimentos + 30+ consumos
+   💉 Sanidad     → 25+ vacunas, tratamientos, diagnósticos
+   📊 Producción  → 20+ registros de peso
+   🐣 Reproducción→ 8 montas + 5 partos
+
+
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║  🎉 ¡LISTO! DATOS PROFESIONALES CARGADOS                          ║
+║                                                                    ║
+║  ✅ 150+ registros sincronizados                                  ║
+║  ✅ Nombres realistas y profesionales                             ║
+║  ✅ Todo conectado entre módulos                                  ║
+║  ✅ Observaciones detalladas                                      ║
+║  ✅ Listo para demos o producción                                 ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+
+📚 DOCUMENTACIÓN ADICIONAL:
+─────────────────────────────────────────────────────────────────────
+✓ README_CARGAR_DATOS.md           → Instrucciones detalladas
+✓ RESUMEN_DATOS_PROFESIONALES.md   → Listado completo de datos
+✓ DATOS_PROFESIONALES_COMPLETOS.sql → Script SQL completo
+
+
+⚠️  IMPORTANTE:
+─────────────────────────────────────────────────────────────────────
+Este script ELIMINA todos los datos existentes de:
+- Cerdos, Alimentos, Consumos, Sanidad, Producción, Reproducción
+
+Mantiene intactos:
+- Usuario "julian" (actualiza su perfil)
+- Estructura de la base de datos
+
+Si tienes datos importantes, haz un BACKUP antes de ejecutar.
+
+
+💡 TIP: ¿Quieres ver el diagrama de sincronización?
+─────────────────────────────────────────────────────────────────────
+Busca arriba en el chat el diagrama Mermaid que muestra cómo
+todos los módulos están conectados entre sí. ¡Visual y claro!
+
+
+🚀 ¿Necesitas ayuda?
+─────────────────────────────────────────────────────────────────────
+Si algo no funciona:
+1. Verifica que estés en el proyecto correcto de Supabase
+2. Asegúrate de copiar TODO el script (desde la primera línea)
+3. Revisa que no haya errores en la consola de Supabase
+4. Intenta ejecutar el script por partes si es muy largo
+
+
+═══════════════════════════════════════════════════════════════════════
+FIN DEL ARCHIVO - ¡Éxito con tus datos profesionales! 🎯
+═══════════════════════════════════════════════════════════════════════
