@@ -52,9 +52,27 @@ export default function Perfil() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (passwordData.new_password !== passwordData.confirm_password) { toast.error("Las contraseñas no coinciden"); return; }
-    try { await apiPost("/auth/change-password", { current_password: passwordData.current_password, new_password: passwordData.new_password }); toast.success("Contraseña actualizada"); setShowPasswordForm(false); setPasswordData({ current_password: "", new_password: "", confirm_password: "" }); }
-    catch (err) { toast.error(err.message || "Error al cambiar contraseña"); }
+    if (passwordData.new_password !== passwordData.confirm_password) { 
+      toast.error("Las contraseñas no coinciden"); 
+      return; 
+    }
+    try { 
+      const currentUser = getUser();
+      if (!currentUser?.id) {
+        toast.error("Usuario no identificado");
+        return;
+      }
+      await apiPost(`/perfil/${currentUser.id}/password`, { 
+        password_actual: passwordData.current_password, 
+        password_nueva: passwordData.new_password 
+      }); 
+      toast.success("Contraseña actualizada"); 
+      setShowPasswordForm(false); 
+      setPasswordData({ current_password: "", new_password: "", confirm_password: "" }); 
+    }
+    catch (err) { 
+      toast.error(err.message || "Error al cambiar contraseña"); 
+    }
   };
 
   const inputClass = "w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all";

@@ -20,7 +20,7 @@ export async function register(req, res) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const { rows } = await query(
-      "INSERT INTO users (username, password_hash, role) VALUES ($1, $2, $3) RETURNING id, username, role",
+      "INSERT INTO users (username, password_hash, role) VALUES ($1, $2, $3) RETURNING id, username, role, nombre_completo, email, telefono, cargo, avatar_url, created_at",
       [username, passwordHash, role]
     );
 
@@ -45,7 +45,7 @@ export async function login(req, res) {
 
   try {
     const { rows } = await query(
-      "SELECT id, username, role, password_hash FROM users WHERE username = $1",
+      "SELECT id, username, role, password_hash, nombre_completo, email, telefono, cargo, avatar_url, created_at FROM users WHERE username = $1",
       [username]
     );
     const user = rows[0];
@@ -54,7 +54,17 @@ export async function login(req, res) {
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: "Credenciales inválidas" });
 
-    const usuario = { id: user.id, username: user.username, role: user.role };
+    const usuario = { 
+      id: user.id, 
+      username: user.username, 
+      role: user.role,
+      nombre_completo: user.nombre_completo,
+      email: user.email,
+      telefono: user.telefono,
+      cargo: user.cargo,
+      avatar_url: user.avatar_url,
+      created_at: user.created_at
+    };
     const token = generateToken(usuario);
 
     res.json({ mensaje: "Login OK", token, usuario });
