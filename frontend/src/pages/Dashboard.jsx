@@ -1,4 +1,4 @@
-// src/pages/Dashboard.jsx — Panel Principal Premium
+// src/pages/Dashboard.jsx — Panel Principal Premium Corregido
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
@@ -14,6 +14,10 @@ export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showPigForm, setShowPigForm] = useState(false);
   const [editingPig, setEditingPig] = useState(null);
+  
+  // 1. NUEVO ESTADO PARA LA BÚSQUEDA
+  const [busqueda, setBusqueda] = useState("");
+
   const location = useLocation();
   const isNested = location.pathname !== "/dashboard";
 
@@ -24,6 +28,12 @@ export default function Dashboard() {
   };
 
   useEffect(() => { loadPigs(); }, []);
+
+  // 2. LÓGICA DE FILTRADO (Se actualiza sola al escribir)
+  const cerdosFiltrados = pigs.filter(cerdo => 
+    cerdo.codigo_arete?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    cerdo.raza?.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   const handleAddPig = async (nuevoCerdo) => {
     try { 
@@ -92,7 +102,6 @@ export default function Dashboard() {
       <Sidebar isMobileOpen={isMobileMenuOpen} onCloseMobile={() => setIsMobileMenuOpen(false)} />
 
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* ── Header ── */}
         <header className="sticky top-0 z-10 h-16 bg-white border-b border-gray-200/80 flex justify-between items-center px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
@@ -119,20 +128,16 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* ── Main Content ── */}
         <main className="flex-1 p-6 lg:p-8">
           {isNested ? (
             <Outlet />
           ) : (
             <div className="space-y-8">
-
-              {/* Bienvenida */}
               <div>
                 <h1 className="text-2xl font-extrabold text-slate-800">Bienvenido, {userName} 👋</h1>
                 <p className="text-gray-500 mt-1">Aquí tienes un resumen de tu granja.</p>
               </div>
 
-              {/* ── Stat Cards ── */}
               {loading ? (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                   {[1, 2, 3, 4].map(i => (
@@ -143,7 +148,6 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                   {stats.map(stat => (
                     <div key={stat.label} className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl p-6 transition-all duration-300 hover:-translate-y-1 group">
-                      {/* Decorative gradient circle */}
                       <div className={`absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg ${stat.shadow}`}>
                         <i className={`fas ${stat.icon} text-white text-lg`}></i>
@@ -155,23 +159,37 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* ── Gestión de Cerdos ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-                <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-8 py-5 border-b border-gray-100 gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
                       <i className="fas fa-paw text-white"></i>
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-slate-800">Gestión de Cerdos</h3>
-                      <p className="text-xs text-gray-400">{pigs.length} registrados en total</p>
+                      <p className="text-xs text-gray-400">{pigs.length} registrados</p>
                     </div>
                   </div>
-                  <button onClick={() => { setShowPigForm(!showPigForm); setEditingPig(null); }}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-300">
-                    <i className={`fas ${showPigForm ? 'fa-times' : 'fa-plus'}`}></i>
-                    {showPigForm ? "Cerrar" : "Nuevo Cerdo"}
-                  </button>
+
+                  {/* ── 3. BARRA DE BÚSQUEDA INTEGRADA ── */}
+                  <div className="flex flex-1 items-center justify-end gap-3 w-full">
+                    <div className="relative w-full max-w-xs">
+                      <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                      <input 
+                        type="text" 
+                        placeholder="Buscar por arete o raza..."
+                        className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                      />
+                    </div>
+                    
+                    <button onClick={() => { setShowPigForm(!showPigForm); setEditingPig(null); }}
+                      className="whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:scale-105 transition-all duration-300">
+                      <i className={`fas ${showPigForm ? 'fa-times' : 'fa-plus'}`}></i>
+                      {showPigForm ? "Cerrar" : "Nuevo"}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="p-6 lg:p-8">
@@ -200,11 +218,16 @@ export default function Dashboard() {
                   )}
 
                   {!loading && !error && (
-                    <PigList pigs={pigs} onToggleStatus={handleToggleStatus} onEdit={handleEditPig} onDelete={handleDeletePig} />
+                    /* 4. IMPORTANTE: Usamos 'cerdosFiltrados' */
+                    <PigList 
+                      pigs={cerdosFiltrados} 
+                      onToggleStatus={handleToggleStatus} 
+                      onEdit={handleEditPig} 
+                      onDelete={handleDeletePig} 
+                    />
                   )}
                 </div>
               </div>
-
             </div>
           )}
         </main>
